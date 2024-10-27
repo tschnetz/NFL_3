@@ -19,7 +19,7 @@ def register_callbacks(app):
         [Input('week-options-store', 'data')],
     )
     def update_week_options(week_options_fetched):
-        response = requests.get("http://127.0.0.1:8001/nfl-events")  # Updated port to 8001
+        response = requests.get("http://0.0.0.0:8001/nfl-events")  # Updated port to 8001
         data = response.json() if response.status_code == 200 else {}
         leagues_data = data.get('leagues', [])
 
@@ -233,7 +233,7 @@ def register_callbacks(app):
     def update_game_data(n_intervals, init_complete, prev_scores_data):
         if not init_complete:
             return dash.no_update, dash.no_update
-        response = requests.get("http://127.0.0.1:8001/nfl-scoreboard-day")  # Updated port to 8001
+        response = requests.get("http://0.0.0.0:8001/nfl-scoreboard-day")  # Updated port to 8001
         games_data = response.json() if response.status_code == 200 else {}
 
         if not games_data:
@@ -310,7 +310,7 @@ def register_callbacks(app):
         triggered_button = ctx.triggered[0]['prop_id'].split('.')[0]
         game_id = json.loads(triggered_button)['index']
 
-        response = requests.get(f"http://127.0.0.1:8001/nfl-scoringplays?game_id={game_id}")  # Updated port to 8001
+        response = requests.get(f"http://0.0.0.0:8001/nfl-scoringplays?game_id={game_id}")  # Updated port to 8001
         scoring_plays = response.json() if response.status_code == 200 else []
 
         outputs = []

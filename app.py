@@ -1,4 +1,3 @@
-# app.py
 import threading
 import uvicorn
 import dash
@@ -28,15 +27,9 @@ app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTST
 app.layout = layout
 register_callbacks(app)
 
-# Function to check if a port is in use
-def is_port_in_use(port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex(('127.0.0.1', port)) == 0
-
 # Function to run FastAPI server
 def run_fastapi():
-    if not is_port_in_use(8001):
-        uvicorn.run(fastapi_app, host="127.0.0.1", port=8001)
+    uvicorn.run(fastapi_app, host="0.0.0.0", port=8001)
 
 # Start FastAPI server in a separate thread
 fastapi_thread = threading.Thread(target=run_fastapi, daemon=True)
@@ -44,4 +37,4 @@ fastapi_thread.start()
 
 # Run Dash server
 if __name__ == "__main__":
-    app.run_server(debug=True, port=PORT)
+    app.run_server(debug=True, host='0.0.0.0', port=PORT)

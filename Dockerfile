@@ -1,17 +1,14 @@
 FROM python:3.12-slim
 
-WORKDIR /app
+# Install dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-COPY . /app
+# Copy your application code
+COPY . .
 
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install gunicorn
+# Expose ports
+EXPOSE 8080 8001
 
-# Non-root user for security
-RUN useradd -m -d /app appuser
-USER appuser
-
-EXPOSE $PORT
-
-# Command to start Gunicorn with your app
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:server
+# Start your services
+CMD ["python", "app.py"]
