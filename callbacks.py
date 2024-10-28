@@ -305,11 +305,11 @@ def register_callbacks(app):
                     home_score = play.get('homeScore', 'N/A')
 
                     formatted_play = html.Div([
-                        html.Img(src=team_logo, height="30px", style={'margin-right': '10px'}),
+                        html.Img(src=team_logo, height="30px", style={'marginRight': '10px'}),
                         html.Span(f"  Q{period} {clock} - {text}"),
                         html.Span(f" {away_score} - {home_score}  ",
-                                  style={'margin-left': '10px', 'fontWeight': 'bold'}),
-                    ], style={'display': 'flex', 'align-items': 'center'})
+                                  style={'marginLeft': '10px', 'fontWeight': 'bold'}),
+                    ], style={'display': 'flex', 'alignItems': 'center'})
 
                     formatted_scoring_plays.append(formatted_play)
 

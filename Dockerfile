@@ -11,7 +11,7 @@ RUN useradd -m -d /app appuser
 USER appuser
 
 # Expose the port used by the application
-EXPOSE $PORT
+EXPOSE 8080
 
 # Command to start the Flask development server
 CMD exec python -m flask run --host=0.0.0.0 --port=8080
