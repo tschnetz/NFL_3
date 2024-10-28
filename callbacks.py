@@ -299,6 +299,22 @@ def register_callbacks(app):
 
         scoring_plays = get_scoring_plays(game_id)
 
+        # Retrieve game data and navigate to the leaders within competitions
+        nfl_events_data = fetch_nfl_events()  # Cached call
+        game_data = next((event for event in nfl_events_data.get("events", []) if event.get("id") == game_id), None)
+
+        if game_data:
+            competition_data = game_data.get("competitions", [{}])[0]
+            game_leaders = competition_data.get("leaders", [])
+            teams = competition_data.get("competitors", [])
+        else:
+            game_leaders = []
+            teams = []
+
+        # Extract team information
+        home_team = teams[0] if teams[0].get("homeAway") == "home" else teams[1]
+        away_team = teams[1] if teams[0].get("homeAway") == "home" else teams[0]
+
         outputs = []
         for i, button_id in enumerate(button_ids):
             if n_clicks_list[i] % 2 == 1:
@@ -306,55 +322,58 @@ def register_callbacks(app):
 
                 # Build the line score table
                 team_rows = []
-                for team_type, scores in [("Home", game_line_scores["home_line_scores"]),
-                                          ("Away", game_line_scores["away_line_scores"])]:
-                    # Logo, team name, and quarterly scores
-                    team_logo = scoring_plays[0]['team']['logo'] if team_type == "Home" else scoring_plays[1]['team'][
-                        'logo']
-                    team_name = scoring_plays[0]['team']['displayName'] if team_type == "Home" else \
-                    scoring_plays[1]['team']['displayName']
-
-                    # Calculate total score
+                for team, scores in [(home_team, game_line_scores["home_line_scores"]),
+                                     (away_team, game_line_scores["away_line_scores"])]:
+                    team_logo = team["team"]["logo"]
+                    team_name = team["team"]["displayName"]
                     total_score = sum(scores)
 
-                    # Build table row
                     team_row = html.Tr([
-                        html.Td(html.Img(src=team_logo, height="30px", style={'marginRight': '10px'})),
-                        html.Td(html.Span(team_name)),
+                        html.Td(html.Img(src=team_logo, height="30px")),
+                        html.Td(team_name),
                         *[html.Td(str(score), style={'textAlign': 'right'}) for score in scores],
-                        # Right-align each quarter score
-                        html.Td(str(total_score), style={'fontWeight': 'bold', 'textAlign': 'right'})
-                        # Right-align total score
+                        html.Td(str(total_score), style={'fontWeight': 'bold', 'textAlign': 'center'})
                     ])
                     team_rows.append(team_row)
 
-                # Create the table with headers and apply styling
                 formatted_line_score = html.Table([
-                    html.Thead(
-                        html.Tr([
-                            html.Th("Logo"),
-                            html.Th("Team"),
-                            html.Th("Q1", style={'textAlign': 'right'}),
-                            html.Th("Q2", style={'textAlign': 'right'}),
-                            html.Th("Q3", style={'textAlign': 'right'}),
-                            html.Th("Q4", style={'textAlign': 'right'}),
-                            html.Th("Total", style={'textAlign': 'right'})
-                        ])
-                    ),
+                    html.Thead(html.Tr([
+                        html.Th(""), html.Th(""),
+                        html.Th("Q1", style={'textAlign': 'right'}), html.Th("Q2", style={'textAlign': 'right'}),
+                        html.Th("Q3", style={'textAlign': 'right'}), html.Th("Q4", style={'textAlign': 'right'}),
+                        html.Th("Total", style={'textAlign': 'center'})
+                    ])),
                     html.Tbody(team_rows)
                 ], style={
-                    'width': '100%',
-                    'borderCollapse': 'collapse',
-                    'marginBottom': '10px',
-                    'backgroundColor': 'rgba(255, 255, 255, 0.5)',  # Transparent background
-                    'borderRadius': '8px',  # Rounded corners
-                    'padding': '10px',
-                    'listStyleType': 'none',
-                    'boxShadow': '0px 4px 8px rgba(0, 0, 0, 0.1)',  # Subtle shadow effect
+                    'width': '100%', 'borderCollapse': 'collapse', 'backgroundColor': 'rgba(255, 255, 255, 0.5)',
+                    'borderRadius': '8px', 'padding': '10px', 'marginBottom': '20px'
                 })
 
-                # Add the line score table as the first item
+                # Add the line score table
                 formatted_scoring_plays.append(formatted_line_score)
+
+                # Game Leaders Section
+                formatted_game_leaders = html.Div([
+                    html.H6("Game Leaders", style={'fontWeight': 'bold', 'paddingBottom': '10px'}),
+                    *[
+                        html.Div([
+                            html.Img(src=player['athlete']['headshot'], height="30px", style={'marginRight': '10px'}),
+                            html.Span(
+                                f"{leader['displayName']} - {player['athlete']['displayName']} ({player['displayValue']})")
+                        ], style={'display': 'flex', 'alignItems': 'center', 'padding': '5px 0'})
+                        for leader in game_leaders for player in leader.get('leaders', [])
+                    ]
+                ], style={
+                    'backgroundColor': 'rgba(255, 255, 255, 0.3)', 'borderRadius': '8px',
+                    'padding': '10px', 'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)'
+                })
+
+                # If game leaders section is empty, add fallback text
+                if not formatted_game_leaders.children:
+                    formatted_game_leaders.children = [html.Div("No leaders data available", style={'color': 'gray'})]
+
+                # Add game leaders below the line score
+                formatted_scoring_plays.append(formatted_game_leaders)
 
                 # Format each scoring play
                 for play in scoring_plays:
@@ -379,3 +398,4 @@ def register_callbacks(app):
                 outputs.append([])
 
         return outputs
+
