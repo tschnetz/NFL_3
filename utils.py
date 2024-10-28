@@ -136,3 +136,67 @@ def line_scores():
                         linescores_dict[game_id]["away_line_scores"] = team_linescores
 
     return linescores_dict  # Always returns a dictionary, even if empty
+
+def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
+    team_rows = []
+    for team, scores in [(home_team, home_line_scores), (away_team, away_line_scores)]:
+        team_logo = team["team"]["logo"]
+        team_name = team["team"]["displayName"]
+        total_score = sum(scores)
+
+        team_row = html.Tr([
+            html.Td(html.Img(src=team_logo, height="30px")),
+            html.Td(team_name),
+            *[html.Td(str(score), style={'textAlign': 'right'}) for score in scores],
+            html.Td(str(total_score), style={'fontWeight': 'bold', 'textAlign': 'center'})
+        ])
+        team_rows.append(team_row)
+
+    return html.Table([
+        html.Thead(html.Tr([
+            html.Th(""), html.Th(""),
+            html.Th("Q1", style={'textAlign': 'right'}), html.Th("Q2", style={'textAlign': 'right'}),
+            html.Th("Q3", style={'textAlign': 'right'}), html.Th("Q4", style={'textAlign': 'right'}),
+            html.Th("Total", style={'textAlign': 'center'})
+        ])),
+        html.Tbody(team_rows)
+    ], style={
+        'width': '100%', 'borderCollapse': 'collapse', 'backgroundColor': 'rgba(255, 255, 255, 0.5)',
+        'borderRadius': '8px', 'padding': '10px', 'marginBottom': '20px'
+    })
+
+def format_game_leaders(game_leaders):
+    formatted_game_leaders = html.Div([
+        html.H6("Game Leaders", style={'fontWeight': 'bold', 'paddingBottom': '10px'}),
+        *[
+            html.Div([
+                html.Img(src=player['athlete']['headshot'], height="30px", style={'marginRight': '10px'}),
+                html.Span(
+                    f"{leader['displayName']} - {player['athlete']['displayName']} ({player['displayValue']})")
+            ], style={'display': 'flex', 'alignItems': 'center', 'padding': '5px 0'})
+            for leader in game_leaders for player in leader.get('leaders', [])
+        ]
+    ], style={
+        'backgroundColor': 'rgba(255, 255, 255, 0.3)', 'borderRadius': '8px',
+        'padding': '10px', 'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)'
+    })
+
+    if not formatted_game_leaders.children:
+        formatted_game_leaders.children = [html.Div("No leaders data available", style={'color': 'gray'})]
+
+    return formatted_game_leaders
+
+def format_scoring_play(play):
+    team_logo = play['team'].get('logo', '')
+    period = play.get('period', {}).get('number', '')
+    clock = play.get('clock', {}).get('displayValue', '')
+    text = play.get('text', '')
+    away_score = play.get('awayScore', 'N/A')
+    home_score = play.get('homeScore', 'N/A')
+
+    return html.Div([
+        html.Img(src=team_logo, height="30px", style={'marginRight': '10px'}),
+        html.Span(f"Q{period} {clock} - {text}"),
+        html.Span(f" {away_score} - {home_score}  ",
+                  style={'marginLeft': '10px', 'fontWeight': 'bold'}),
+    ], style={'display': 'flex', 'alignItems': 'center'})

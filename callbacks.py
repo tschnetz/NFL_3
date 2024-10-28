@@ -5,6 +5,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from utils import load_last_fetched_odds, extract_game_info, line_scores
+from utils import format_line_score, format_game_leaders, format_scoring_play
 from api import fetch_nfl_events, fetch_espn_bet_odds, fetch_games_by_day, get_scoring_plays
 
 last_fetched_odds = load_last_fetched_odds()
@@ -277,6 +278,7 @@ def register_callbacks(app):
 
         return updated_game_data, games_in_progress
 
+
     @app.callback(
         Output({'type': 'scoring-plays', 'index': dash.dependencies.ALL}, 'children'),
         [Input({'type': 'game-button', 'index': dash.dependencies.ALL}, 'n_clicks')],
@@ -290,17 +292,14 @@ def register_callbacks(app):
         triggered_button = ctx.triggered[0]['prop_id'].split('.')[0]
         game_id = json.loads(triggered_button)['index']
 
-        # Get line scores from line_scores function
-        all_line_scores = line_scores()  # Dictionary with game_id as keys
+        all_line_scores = line_scores()
         game_line_scores = all_line_scores.get(game_id, {
             "home_line_scores": [],
             "away_line_scores": []
         })
 
         scoring_plays = get_scoring_plays(game_id)
-
-        # Retrieve game data and navigate to the leaders within competitions
-        nfl_events_data = fetch_nfl_events()  # Cached call
+        nfl_events_data = fetch_nfl_events()
         game_data = next((event for event in nfl_events_data.get("events", []) if event.get("id") == game_id), None)
 
         if game_data:
@@ -311,7 +310,6 @@ def register_callbacks(app):
             game_leaders = []
             teams = []
 
-        # Extract team information
         home_team = teams[0] if teams[0].get("homeAway") == "home" else teams[1]
         away_team = teams[1] if teams[0].get("homeAway") == "home" else teams[0]
 
@@ -320,77 +318,15 @@ def register_callbacks(app):
             if n_clicks_list[i] % 2 == 1:
                 formatted_scoring_plays = []
 
-                # Build the line score table
-                team_rows = []
-                for team, scores in [(home_team, game_line_scores["home_line_scores"]),
-                                     (away_team, game_line_scores["away_line_scores"])]:
-                    team_logo = team["team"]["logo"]
-                    team_name = team["team"]["displayName"]
-                    total_score = sum(scores)
-
-                    team_row = html.Tr([
-                        html.Td(html.Img(src=team_logo, height="30px")),
-                        html.Td(team_name),
-                        *[html.Td(str(score), style={'textAlign': 'right'}) for score in scores],
-                        html.Td(str(total_score), style={'fontWeight': 'bold', 'textAlign': 'center'})
-                    ])
-                    team_rows.append(team_row)
-
-                formatted_line_score = html.Table([
-                    html.Thead(html.Tr([
-                        html.Th(""), html.Th(""),
-                        html.Th("Q1", style={'textAlign': 'right'}), html.Th("Q2", style={'textAlign': 'right'}),
-                        html.Th("Q3", style={'textAlign': 'right'}), html.Th("Q4", style={'textAlign': 'right'}),
-                        html.Th("Total", style={'textAlign': 'center'})
-                    ])),
-                    html.Tbody(team_rows)
-                ], style={
-                    'width': '100%', 'borderCollapse': 'collapse', 'backgroundColor': 'rgba(255, 255, 255, 0.5)',
-                    'borderRadius': '8px', 'padding': '10px', 'marginBottom': '20px'
-                })
-
-                # Add the line score table
+                formatted_line_score = format_line_score(home_team, away_team, game_line_scores["home_line_scores"],
+                                                         game_line_scores["away_line_scores"])
                 formatted_scoring_plays.append(formatted_line_score)
 
-                # Game Leaders Section
-                formatted_game_leaders = html.Div([
-                    html.H6("Game Leaders", style={'fontWeight': 'bold', 'paddingBottom': '10px'}),
-                    *[
-                        html.Div([
-                            html.Img(src=player['athlete']['headshot'], height="30px", style={'marginRight': '10px'}),
-                            html.Span(
-                                f"{leader['displayName']} - {player['athlete']['displayName']} ({player['displayValue']})")
-                        ], style={'display': 'flex', 'alignItems': 'center', 'padding': '5px 0'})
-                        for leader in game_leaders for player in leader.get('leaders', [])
-                    ]
-                ], style={
-                    'backgroundColor': 'rgba(255, 255, 255, 0.3)', 'borderRadius': '8px',
-                    'padding': '10px', 'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)'
-                })
-
-                # If game leaders section is empty, add fallback text
-                if not formatted_game_leaders.children:
-                    formatted_game_leaders.children = [html.Div("No leaders data available", style={'color': 'gray'})]
-
-                # Add game leaders below the line score
+                formatted_game_leaders = format_game_leaders(game_leaders)
                 formatted_scoring_plays.append(formatted_game_leaders)
 
-                # Format each scoring play
                 for play in scoring_plays:
-                    team_logo = play['team'].get('logo', '')
-                    period = play.get('period', {}).get('number', '')
-                    clock = play.get('clock', {}).get('displayValue', '')
-                    text = play.get('text', '')
-                    away_score = play.get('awayScore', 'N/A')
-                    home_score = play.get('homeScore', 'N/A')
-
-                    formatted_play = html.Div([
-                        html.Img(src=team_logo, height="30px", style={'marginRight': '10px'}),
-                        html.Span(f"Q{period} {clock} - {text}"),
-                        html.Span(f" {away_score} - {home_score}  ",
-                                  style={'marginLeft': '10px', 'fontWeight': 'bold'}),
-                    ], style={'display': 'flex', 'alignItems': 'center'})
-
+                    formatted_play = format_scoring_play(play)
                     formatted_scoring_plays.append(formatted_play)
 
                 outputs.append(formatted_scoring_plays)
@@ -398,4 +334,5 @@ def register_callbacks(app):
                 outputs.append([])
 
         return outputs
+
 
