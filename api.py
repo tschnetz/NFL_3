@@ -1,12 +1,7 @@
-# api.py
-from datetime import datetime
-from fastapi import FastAPI
 import requests
 from config import HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL
+from datetime import datetime
 
-app = FastAPI()
-
-@app.get("/nfl-events")
 def fetch_nfl_events():
     querystring = {"year": "2024"}
     response = requests.get(NFL_EVENTS_URL, headers=HEADERS, params=querystring)
@@ -14,8 +9,7 @@ def fetch_nfl_events():
         return response.json()
     return {"error": "Failed to fetch NFL events"}
 
-@app.get("/nfl-eventodds")
-def fetch_espn_bet_odds(game_id: str, game_status: str):
+def fetch_espn_bet_odds(game_id):
     querystring = {"id": game_id}
     response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
     if response.status_code == 200:
@@ -25,7 +19,6 @@ def fetch_espn_bet_odds(game_id: str, game_status: str):
                 return item.get('details', 'N/A')
     return {"error": "Failed to fetch odds"}
 
-@app.get("/nfl-scoreboard-day")
 def fetch_games_by_day():
     today = datetime.now().strftime('%Y%m%d')
     querystring = {"day": today}
@@ -34,8 +27,7 @@ def fetch_games_by_day():
         return response.json()
     return {"error": "Failed to fetch games"}
 
-@app.get("/nfl-scoringplays")
-def get_scoring_plays(game_id: str):
+def get_scoring_plays(game_id):
     querystring = {"id": game_id}
     response = requests.get(SCORING_PLAYS_URL, headers=HEADERS, params=querystring)
     if response.status_code == 200:

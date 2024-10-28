@@ -1,12 +1,11 @@
-# callbacks.py
 import dash
 import json
 from dash.dependencies import Input, Output, State, MATCH
 from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
-import requests
 from utils import load_last_fetched_odds, extract_game_info
+from api import fetch_nfl_events, fetch_espn_bet_odds, fetch_games_by_day, get_scoring_plays
 
 last_fetched_odds = load_last_fetched_odds()
 
@@ -19,8 +18,7 @@ def register_callbacks(app):
         [Input('week-options-store', 'data')],
     )
     def update_week_options(week_options_fetched):
-        response = requests.get("http://0.0.0.0:8001/nfl-events")  # Updated port to 8001
-        data = response.json() if response.status_code == 200 else {}
+        data = fetch_nfl_events()
         leagues_data = data.get('leagues', [])
 
         if not leagues_data:
@@ -47,13 +45,10 @@ def register_callbacks(app):
 
                     week_counter += 1
 
-        # if week_options_fetched or not week_options:  # If week options have already been fetched or no options available
-        #    return week_options, True, selected_value, data  # Return the fetched data
-
         if selected_value is None and week_options:
             selected_value = week_options[0]['value']
 
-        return week_options, True, selected_value, data  # Return the fetched data to store it
+        return week_options, True, selected_value, data
 
     @app.callback(
         [Output('static-game-info', 'children'), Output('init-complete', 'data')],
@@ -109,11 +104,9 @@ def register_callbacks(app):
             home_id = game_info['Home Team ID']
             away_id = game_info['Away Team ID']
 
-            # Default placeholders for `home_team_extra` and `away_team_extra`
             home_team_extra_info = ""
             away_team_extra_info = ""
 
-            # Set placeholders or final values based on game status
             if game_status.lower() == "final":
                 home_score = game_info['Home Team Score']
                 away_score = game_info['Away Team Score']
@@ -123,7 +116,6 @@ def register_callbacks(app):
                 away_score = ""
                 quarter_time_display = ""
 
-            # Construct the game row with appropriate values
             games_info.append(
                 dbc.Button(
                     dbc.Row([
@@ -184,7 +176,6 @@ def register_callbacks(app):
 
         return games_info, True
 
-
     @app.callback(
         [
             Output({'type': 'home-score', 'index': MATCH}, 'children'),
@@ -202,7 +193,6 @@ def register_callbacks(app):
         if not game_data:
             return [dash.no_update] * 5
 
-        # Extract relevant data
         game_status = game_data.get('status', 'In Progress').lower()
         home_score = game_data.get('Home Team Score', "")
         away_score = game_data.get('Away Team Score', "")
@@ -211,17 +201,14 @@ def register_callbacks(app):
         down_distance = game_data.get('Down Distance', "")
         possession_team = game_data.get('Possession', "")
 
-        # Determine possession and extra info
         home_team_id = game_data.get('Home Team ID')
         away_team_id = game_data.get('Away Team ID')
         home_team_extra_info = "🏈 " + down_distance if possession_team == home_team_id else ""
         away_team_extra_info = "🏈 " + down_distance if possession_team == away_team_id else ""
 
-        # Set quarter time display
         quarter_time_display = "Final" if game_status == "final" else f"{quarter} Qtr ● {time_remaining}"
 
         return home_score, away_score, quarter_time_display, home_team_extra_info, away_team_extra_info
-
 
     @app.callback(
         Output('scores-data', 'data'),
@@ -233,11 +220,9 @@ def register_callbacks(app):
     def update_game_data(n_intervals, init_complete, prev_scores_data):
         if not init_complete:
             return dash.no_update, dash.no_update
-        response = requests.get("http://0.0.0.0:8001/nfl-scoreboard-day")  # Updated port to 8001
-        games_data = response.json() if response.status_code == 200 else {}
+        games_data = fetch_games_by_day()
 
         if not games_data:
-            # print("No games data found.")
             return dash.no_update, False
 
         updated_game_data = []
@@ -248,13 +233,11 @@ def register_callbacks(app):
             competitions = game.get('competitions', [])
 
             if not competitions:
-                # print(f"No competitions found for game ID {game_id}")
                 continue
 
             status_info = competitions[0].get('status', {})
             game_status = status_info.get('type', {}).get('description', 'N/A')
 
-            # Skip games with status "Scheduled" or "Final"
             if game_status in ["Scheduled", "Final"]:
                 continue
 
@@ -290,12 +273,9 @@ def register_callbacks(app):
             })
 
         if prev_scores_data == updated_game_data:
-            # print("No updates needed.")
             return dash.no_update, games_in_progress
 
-        # print("Scores updated.")
         return updated_game_data, games_in_progress
-
 
     @app.callback(
         Output({'type': 'scoring-plays', 'index': dash.dependencies.ALL}, 'children'),
@@ -310,8 +290,7 @@ def register_callbacks(app):
         triggered_button = ctx.triggered[0]['prop_id'].split('.')[0]
         game_id = json.loads(triggered_button)['index']
 
-        response = requests.get(f"http://0.0.0.0:8001/nfl-scoringplays?game_id={game_id}")  # Updated port to 8001
-        scoring_plays = response.json() if response.status_code == 200 else []
+        scoring_plays = get_scoring_plays(game_id)
 
         outputs = []
         for i, button_id in enumerate(button_ids):
