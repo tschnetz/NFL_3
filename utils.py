@@ -4,7 +4,9 @@ from dash import dcc, html
 import requests
 import pytz
 from datetime import datetime, timezone
-from config import HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, ODDS_FILE_PATH, SCORING_PLAYS_URL
+from config import HEADERS, ODDS_URL, ODDS_FILE_PATH
+from api import fetch_nfl_events, fetch_games_by_day
+
 
 def save_last_fetched_odds(last_fetched_odds):
     """Save the last fetched odds to a JSON file."""
@@ -19,11 +21,6 @@ def load_last_fetched_odds():
     except FileNotFoundError:
         return {}
 
-def fetch_nfl_events():
-    """Fetch NFL events data."""
-    querystring = {"year": "2024"}
-    response = requests.get(NFL_EVENTS_URL, headers=HEADERS, params=querystring)
-    return response.json() if response.status_code == 200 else {}
 
 def fetch_espn_bet_odds(game_id, game_status, last_fetched_odds):
     """Fetch ESPN BET odds based on game status."""
@@ -56,13 +53,6 @@ def fetch_espn_bet_odds(game_id, game_status, last_fetched_odds):
         return last_fetched_odds[game_id]  # Return last fetched odds if available
 
     return None  # Return None if no odds are found
-
-def fetch_games_by_day():
-    """Fetch game data for all games on a specific day."""
-    today = datetime.now().strftime('%Y%m%d')
-    querystring = {"day": today}
-    response = requests.get(SCOREBOARD_URL, headers=HEADERS, params=querystring)
-    return response.json() if response.status_code == 200 else {}
 
 
 def extract_game_info(event, last_fetched_odds):
@@ -112,35 +102,37 @@ def extract_game_info(event, last_fetched_odds):
     }
 
 
-def get_scoring_plays(game_id):
-    """Fetch and return formatted scoring plays as HTML components."""
-    querystring = {"id": game_id}
-    response = requests.get(SCORING_PLAYS_URL, headers=HEADERS, params=querystring)
+def line_scores():
+    # Retrieve the cached NFL events data
+    events_data = fetch_nfl_events()
 
-    if response.status_code == 200:
-        scoring_data = response.json()
-        scoring_plays = scoring_data.get('scoringPlays', [])
-        formatted_scoring_plays = []
+    # Initialize dictionary to store linescores by game_id
+    linescores_dict = {}
 
-        # Iterate over the list of scoring plays
-        for play in scoring_plays:
-            team_logo = play['team'].get('logo', '')
-            period = play.get('period', {}).get('number', '')
-            clock = play.get('clock', {}).get('displayValue', '')
-            text = play.get('text', '')
-            away_score = play.get('awayScore', 'N/A')
-            home_score = play.get('homeScore', 'N/A')
+    if not events_data:  # Check if events_data is None or empty
+        return linescores_dict  # Return an empty dictionary if no data is available
 
-            # Format each scoring play for display
-            formatted_play = html.Div([
-                html.Img(src=team_logo, height="30px", style={'margin-right': '10px'}),
-                html.Span(f"Q{period} {clock} - "),
-                html.Span(text),
-                html.Span(f" ({away_score} - {home_score})", style={'margin-left': '10px'})
-            ], style={'display': 'flex', 'align-items': 'center'})
+    # Extract linescores information from each event
+    for event in events_data.get("events", []):
+        game_id = event.get("id")
+        game_status = event.get("status", {}).get("type", {}).get("description", "").lower()
+        season_type = event.get("season", {}).get("type")
 
-            formatted_scoring_plays.append(formatted_play)
+        # Only include regular season games with a final status
+        if season_type == 2 and game_status == "final":  # Regular season and completed games only
+            linescores_dict[game_id] = {
+                "home_line_scores": [],
+                "away_line_scores": []
+            }
 
-        return formatted_scoring_plays
-    else:
-        return []  # Return an empty list if the API call fails
+            # Loop through teams to classify home and away team scores
+            for competition in event.get("competitions", []):
+                for competitor in competition.get("competitors", []):
+                    team_linescores = [score.get("value") for score in competitor.get("linescores", [])]
+
+                    if competitor.get("homeAway") == "home":
+                        linescores_dict[game_id]["home_line_scores"] = team_linescores
+                    elif competitor.get("homeAway") == "away":
+                        linescores_dict[game_id]["away_line_scores"] = team_linescores
+
+    return linescores_dict  # Always returns a dictionary, even if empty

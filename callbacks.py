@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output, State, MATCH
 from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
-from utils import load_last_fetched_odds, extract_game_info
+from utils import load_last_fetched_odds, extract_game_info, line_scores
 from api import fetch_nfl_events, fetch_espn_bet_odds, fetch_games_by_day, get_scoring_plays
 
 last_fetched_odds = load_last_fetched_odds()
@@ -290,12 +290,73 @@ def register_callbacks(app):
         triggered_button = ctx.triggered[0]['prop_id'].split('.')[0]
         game_id = json.loads(triggered_button)['index']
 
+        # Get line scores from line_scores function
+        all_line_scores = line_scores()  # Dictionary with game_id as keys
+        game_line_scores = all_line_scores.get(game_id, {
+            "home_line_scores": [],
+            "away_line_scores": []
+        })
+
         scoring_plays = get_scoring_plays(game_id)
 
         outputs = []
         for i, button_id in enumerate(button_ids):
             if n_clicks_list[i] % 2 == 1:
                 formatted_scoring_plays = []
+
+                # Build the line score table
+                team_rows = []
+                for team_type, scores in [("Home", game_line_scores["home_line_scores"]),
+                                          ("Away", game_line_scores["away_line_scores"])]:
+                    # Logo, team name, and quarterly scores
+                    team_logo = scoring_plays[0]['team']['logo'] if team_type == "Home" else scoring_plays[1]['team'][
+                        'logo']
+                    team_name = scoring_plays[0]['team']['displayName'] if team_type == "Home" else \
+                    scoring_plays[1]['team']['displayName']
+
+                    # Calculate total score
+                    total_score = sum(scores)
+
+                    # Build table row
+                    team_row = html.Tr([
+                        html.Td(html.Img(src=team_logo, height="30px", style={'marginRight': '10px'})),
+                        html.Td(html.Span(team_name)),
+                        *[html.Td(str(score), style={'textAlign': 'right'}) for score in scores],
+                        # Right-align each quarter score
+                        html.Td(str(total_score), style={'fontWeight': 'bold', 'textAlign': 'right'})
+                        # Right-align total score
+                    ])
+                    team_rows.append(team_row)
+
+                # Create the table with headers and apply styling
+                formatted_line_score = html.Table([
+                    html.Thead(
+                        html.Tr([
+                            html.Th("Logo"),
+                            html.Th("Team"),
+                            html.Th("Q1", style={'textAlign': 'right'}),
+                            html.Th("Q2", style={'textAlign': 'right'}),
+                            html.Th("Q3", style={'textAlign': 'right'}),
+                            html.Th("Q4", style={'textAlign': 'right'}),
+                            html.Th("Total", style={'textAlign': 'right'})
+                        ])
+                    ),
+                    html.Tbody(team_rows)
+                ], style={
+                    'width': '100%',
+                    'borderCollapse': 'collapse',
+                    'marginBottom': '10px',
+                    'backgroundColor': 'rgba(255, 255, 255, 0.5)',  # Transparent background
+                    'borderRadius': '8px',  # Rounded corners
+                    'padding': '10px',
+                    'listStyleType': 'none',
+                    'boxShadow': '0px 4px 8px rgba(0, 0, 0, 0.1)',  # Subtle shadow effect
+                })
+
+                # Add the line score table as the first item
+                formatted_scoring_plays.append(formatted_line_score)
+
+                # Format each scoring play
                 for play in scoring_plays:
                     team_logo = play['team'].get('logo', '')
                     period = play.get('period', {}).get('number', '')
@@ -306,7 +367,7 @@ def register_callbacks(app):
 
                     formatted_play = html.Div([
                         html.Img(src=team_logo, height="30px", style={'marginRight': '10px'}),
-                        html.Span(f"  Q{period} {clock} - {text}"),
+                        html.Span(f"Q{period} {clock} - {text}"),
                         html.Span(f" {away_score} - {home_score}  ",
                                   style={'marginLeft': '10px', 'fontWeight': 'bold'}),
                     ], style={'display': 'flex', 'alignItems': 'center'})

@@ -1,7 +1,10 @@
+from cache_config import cache  # Import cache directly
 import requests
-from config import HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL
 from datetime import datetime
+from config import HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL
 
+
+@cache.memoize(timeout=86400)  # Cache for 24 hours
 def fetch_nfl_events():
     querystring = {"year": "2024"}
     response = requests.get(NFL_EVENTS_URL, headers=HEADERS, params=querystring)
@@ -9,6 +12,7 @@ def fetch_nfl_events():
         return response.json()
     return {"error": "Failed to fetch NFL events"}
 
+# Other functions remain the same
 def fetch_espn_bet_odds(game_id):
     querystring = {"id": game_id}
     response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
