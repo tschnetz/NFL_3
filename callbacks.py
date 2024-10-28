@@ -325,9 +325,7 @@ def register_callbacks(app):
                 formatted_game_leaders = format_game_leaders(game_leaders)
                 formatted_scoring_plays.append(formatted_game_leaders)
 
-                for play in scoring_plays:
-                    formatted_play = format_scoring_play(play)
-                    formatted_scoring_plays.append(formatted_play)
+                formatted_scoring_plays.append(format_scoring_play(scoring_plays))
 
                 outputs.append(formatted_scoring_plays)
             else:

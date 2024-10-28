@@ -186,17 +186,31 @@ def format_game_leaders(game_leaders):
 
     return formatted_game_leaders
 
-def format_scoring_play(play):
-    team_logo = play['team'].get('logo', '')
-    period = play.get('period', {}).get('number', '')
-    clock = play.get('clock', {}).get('displayValue', '')
-    text = play.get('text', '')
-    away_score = play.get('awayScore', 'N/A')
-    home_score = play.get('homeScore', 'N/A')
 
+def format_scoring_play(scoring_plays):
+    """
+    Takes a list of scoring plays and returns a styled Div with the title "Scoring Plays"
+    and a formatted list of individual play elements.
+    """
+    # Format each play as a separate Div element
+    formatted_plays = [
+        html.Div([
+            html.Img(src=play['team'].get('logo', ''), height="30px", style={'marginRight': '10px'}),
+            html.Span(f"Q{play.get('period', {}).get('number', '')} {play.get('clock', {}).get('displayValue', '')} - {play.get('text', '')}"),
+            html.Span(f"{play.get('awayScore', 'N/A')} - {play.get('homeScore', 'N/A')}",
+                      style={'marginLeft': '10px', 'fontWeight': 'bold'})
+        ], style={'display': 'flex', 'alignItems': 'center', 'padding': '5px 0'})
+        for play in scoring_plays
+    ]
+
+    # Wrap all plays in a Div with a title and background styling
     return html.Div([
-        html.Img(src=team_logo, height="30px", style={'marginRight': '10px'}),
-        html.Span(f"Q{period} {clock} - {text}"),
-        html.Span(f" {away_score} - {home_score}  ",
-                  style={'marginLeft': '10px', 'fontWeight': 'bold'}),
-    ], style={'display': 'flex', 'alignItems': 'center'})
+        html.H6("Scoring Plays", style={'fontWeight': 'bold', 'paddingBottom': '10px'}),
+        *formatted_plays  # Unpack the list of individual formatted plays
+    ], style={
+        'backgroundColor': 'rgba(255, 255, 255, 0.3)',  # Transparent background
+        'borderRadius': '8px',
+        'padding': '10px',
+        'marginBottom': '20px',
+        'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)'
+    })
