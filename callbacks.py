@@ -175,7 +175,7 @@ def register_callbacks(app):
             games_info.append(html.Div(id={'type': 'scoring-plays', 'index': game_id}, children=[]))
             games_info.append(html.Hr())
 
-        return games_info, True
+        return (games_info, True)
 
     @app.callback(
         [
