@@ -11,6 +11,9 @@ NFL_EVENTS_URL = "https://nfl-api-data.p.rapidapi.com/nfl-events"
 ODDS_URL = "https://nfl-api-data.p.rapidapi.com/nfl-eventodds"
 SCORING_PLAYS_URL = "https://nfl-api-data.p.rapidapi.com/nfl-scoringplays"
 SCOREBOARD_URL = "https://nfl-api-data.p.rapidapi.com/nfl-scoreboard-day"
+TEAMS_URL = "https://nfl-api-data.p.rapidapi.com/nfl-team-list"
+RECORD_URL = "https://nfl-api-data.p.rapidapi.com/nfl-team-record"
+DIVISION_URL = "https://nfl-api-data.p.rapidapi.com/nfl-team-groups"
 HEADERS = {
     "x-rapidapi-key": API_KEY,
     "x-rapidapi-host": "nfl-api-data.p.rapidapi.com"

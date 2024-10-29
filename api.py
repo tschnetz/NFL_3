@@ -1,7 +1,8 @@
 from cache_config import cache  # Import cache directly
 import requests
 from datetime import datetime
-from config import HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL
+from config import (HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL,
+                    SCORING_PLAYS_URL, TEAMS_URL, RECORD_URL, DIVISION_URL)
 
 
 @cache.memoize(timeout=1800)  # Cache for 30 minutes
@@ -34,6 +35,7 @@ def fetch_espn_bet_odds(game_id):
         print(f"Error fetching odds: {e}")
         return None
 
+
 def fetch_games_by_day():
     today = datetime.now().strftime('%Y%m%d')
     querystring = {"day": today}
@@ -53,4 +55,42 @@ def get_scoring_plays(game_id):
         return response.json().get('scoringPlays', [])
     except requests.exceptions.RequestException as e:
         print(f"Error fetching scoring plays: {e}")
+        return None
+
+
+def fetch_teams():
+    try:
+        print(f"Requesting URL: {TEAMS_URL}")
+        response = requests.get(TEAMS_URL, headers=HEADERS)
+        print(f"Response status code: {response.status_code}")
+        response.raise_for_status()  # Raise an exception for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching NFL teams: {e}")
+        return None
+
+
+def fetch_team_records(team_id):
+    querystring = {"id": team_id, "year": "2024"}
+    try:
+        print(f"Requesting URL: {RECORD_URL}")
+        response = requests.get(RECORD_URL, headers=HEADERS, params=querystring)
+        print(f"Response status code: {response.status_code}")
+        response.raise_for_status()  # Raise an exception for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching team record: {e}")
+        return None
+
+
+def fetch_division(team_id):
+    querystring = {"id": team_id, "year": "2024"}
+    try:
+        print(f"Requesting URL: {DIVISION_URL}")
+        response = requests.get(DIVISION_URL, headers=HEADERS, params=querystring)
+        print(f"Response status code: {response.status_code}")
+        response.raise_for_status()  # Raise an exception for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching team division: {e}")
         return None

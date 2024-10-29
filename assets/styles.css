@@ -2,8 +2,8 @@
 body {
   background: repeating-linear-gradient(
     90deg,  /* Horizontal stripes */
-    #4CAF50,  /* Dark green color for the grass */
-    #4CAF50 150px,  /* Width of the dark green stripe (wider field stripe) */
+    #76c57b,  /* Dark green color for the grass */
+    #76c57b 150px,  /* Width of the dark green stripe (wider field stripe) */
     white 150px,  /* Start the white stripe after 150px */
     white 160px  /* Make the white stripe (yard line) thin, only 10px */
   );
@@ -84,4 +84,36 @@ h1  {
   .game-row {
     padding: 10px 0;
   }
+}
+/* Base styling for 3D nav buttons */
+.nav-link-custom {
+  color: black;
+  font-weight: bold;
+  padding: 10px 20px;
+  margin-right: 15px;
+  text-align: center;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.3); /* Transparent white background when inactive */
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 3D shadow */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover effect to enhance 3D look */
+.nav-link-custom:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Active style for the selected nav button */
+.nav-link-custom-active {
+  background-color: white; /* Solid white for active state */
+  color: black;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+  transform: translateY(-2px); /* Slight lift for 3D effect */
+}
+
+.nav-link-custom-active:hover {
+  background-color: white; /* Keep solid white on hover if active */
 }
