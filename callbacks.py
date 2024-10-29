@@ -111,7 +111,7 @@ def register_callbacks(app):
             if game_status.lower() == "final":
                 home_score = game_info['Home Team Score']
                 away_score = game_info['Away Team Score']
-                quarter_time_display = ""
+                quarter_time_display = "FINAL"
             else:
                 home_score = ""
                 away_score = ""
@@ -135,7 +135,7 @@ def register_callbacks(app):
                         ),
                         dbc.Col(
                             html.Div([
-                                html.H5(game_info['Game Status']),
+                                # html.H5(game_info['Game Status']),
                                 html.H6(game_info['Odds']) if game_info['Odds'] else "",
                                 html.P(game_info['Start Date (EST)'], style={'margin': '0', 'padding': '0'}),
                                 html.P(f"{game_info['Location']} - {game_info['Network']}",
