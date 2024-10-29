@@ -33,16 +33,19 @@ def fetch_espn_bet_odds(game_id):
 
 def fetch_games_by_day():
     try:
-        print(f"Requesting URL: {SCOREBOARD_URL}")  # Corrected print statement
         response = requests.get(SCOREBOARD_URL, headers=HEADERS)
-        print(f"Response status code: {response.status_code}")  # Corrected print statement
-        response.raise_for_status()
+        response.raise_for_status()  # Raise an exception for bad status codes
+
         data = response.json()
+        print(f"Full API response: {data}")  # Print the entire JSON response
+
         if 'error' in data:
-            print(f"API Error: {data['error']}")  # Corrected print statement
+            print(f"API Error: {data['error']}")
+            # You can potentially extract more error details from the response here
         return data
+
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching games: {e}")  # Corrected print statement
+        print(f"Error fetching games: {e}")
         return None
 
 def get_scoring_plays(game_id):
