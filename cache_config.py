@@ -6,5 +6,5 @@ disk_cache = diskcache.Cache("cache-directory")  # Set directory for disk storag
 cache = Cache(config={
     'CACHE_TYPE': 'filesystem',
     'CACHE_DIR': "cache-directory",  # Directory for disk-based caching
-    'CACHE_DEFAULT_TIMEOUT': 86400,  # Cache timeout set to 24 hours
+    'CACHE_DEFAULT_TIMEOUT': 3600,  # Cache timeout set to 24 hours
 })
