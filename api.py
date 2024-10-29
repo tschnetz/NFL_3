@@ -33,16 +33,16 @@ def fetch_espn_bet_odds(game_id):
 
 def fetch_games_by_day():
     try:
-        print(f"Requesting URL: {SCOREBOARD_URL}")
+        print(f"Requesting URL: {SCOREBOARD_URL}")  # Corrected print statement
         response = requests.get(SCOREBOARD_URL, headers=HEADERS)
-        print(f"Response status code: {response.status_code}")
+        print(f"Response status code: {response.status_code}")  # Corrected print statement
         response.raise_for_status()
         data = response.json()
         if 'error' in data:
-            print("API Error:", data['error'])
+            print(f"API Error: {data['error']}")  # Corrected print statement
         return data
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching games: {e}")
+        print(f"Error fetching games: {e}")  # Corrected print statement
         return None
 
 def get_scoring_plays(game_id):
