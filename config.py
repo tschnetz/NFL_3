@@ -2,7 +2,9 @@
 import os
 from dotenv import load_dotenv
 
-# load_dotenv()
+# Only load from .env if running locally
+if not os.getenv("API_KEY"):
+    load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 NFL_EVENTS_URL = "https://nfl-api-data.p.rapidapi.com/nfl-events"

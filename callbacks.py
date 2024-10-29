@@ -9,6 +9,8 @@ from utils import format_line_score, format_game_leaders, format_scoring_play
 from api import fetch_nfl_events, fetch_espn_bet_odds, fetch_games_by_day, get_scoring_plays
 
 last_fetched_odds = load_last_fetched_odds()
+# Flag to check if initial API call returned events
+initial_api_call_returned_events = None
 
 def register_callbacks(app):
     @app.callback(
@@ -219,12 +221,23 @@ def register_callbacks(app):
         prevent_initial_call=True
     )
     def update_game_data(n_intervals, init_complete, prev_scores_data):
+        global initial_api_call_returned_events
+
         if not init_complete:
             return dash.no_update, dash.no_update
+
+        # Check if the initial API call did not return events
+        if initial_api_call_returned_events is False:
+            return dash.no_update, False
+
         games_data = fetch_games_by_day()
 
-        if not games_data:
+        if not games_data or not games_data.get('events'):
+            initial_api_call_returned_events = False
             return dash.no_update, False
+
+        # Set the flag to True if events are found
+        initial_api_call_returned_events = True
 
         updated_game_data = []
         games_in_progress = False
