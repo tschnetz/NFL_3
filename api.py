@@ -25,14 +25,13 @@ def fetch_espn_bet_odds(game_id):
 
 def fetch_games_by_day():
     response = requests.get(SCOREBOARD_URL, headers=HEADERS)
-    print("Response status:", response.status_code)
-    print("Response headers:", response.headers)
-    print("Response content:", response.text[:500])  # Log first 500 characters of response for inspection
-
     if response.status_code == 200:
-        return response.json()
+        data = response.json()
+        if 'error' in data:
+            print("API Error:", data['error'])
+        return data
     else:
-        print("Failed to fetch games data.")
+        print("Failed with status code:", response.status_code)
     return {"error": "Failed to fetch games"}
 
 
