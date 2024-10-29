@@ -15,5 +15,5 @@ HEADERS = {
     "x-rapidapi-key": API_KEY,
     "x-rapidapi-host": "nfl-api-data.p.rapidapi.com"
 }
-ODDS_FILE_PATH = 'last_fetched_odds.json'
+ODDS_FILE_PATH = 'data/last_fetched_odds.json'
 PORT = int(os.environ.get('PORT', 8080))
