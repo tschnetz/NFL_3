@@ -4,7 +4,7 @@ from datetime import datetime
 from config import HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL
 
 
-@cache.memoize(timeout=3600)  # Cache for 1 hour
+@cache.memoize(timeout=900)  # Cache for 15 mins
 def fetch_nfl_events():
     querystring = {"year": "2024"}
     response = requests.get(NFL_EVENTS_URL, headers=HEADERS, params=querystring)
