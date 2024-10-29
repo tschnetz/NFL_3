@@ -4,6 +4,7 @@ from datetime import datetime
 from config import HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL
 
 
+@cache.memoize(timeout=1800)  # Cache for 30 minutes
 def fetch_nfl_events():
     querystring = {"year": "2024"}
     try:
@@ -16,6 +17,8 @@ def fetch_nfl_events():
         print(f"Error fetching NFL events: {e}")
         return None
 
+
+@cache.memoize(timeout=1800)  # Cache for 30 minutes
 def fetch_espn_bet_odds(game_id):
     querystring = {"id": game_id}
     try:

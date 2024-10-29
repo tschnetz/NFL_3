@@ -14,6 +14,11 @@ app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTST
 
 # Initialize diskcache as the backend for caching
 cache.init_app(app.server)
+# Configure cache
+
+# Clear cache at the start
+with app.server.app_context():
+    cache.clear()
 
 # Set up layout and callbacks
 app.layout = layout

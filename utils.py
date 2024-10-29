@@ -135,7 +135,7 @@ def line_scores():
                     elif competitor.get("homeAway") == "away":
                         linescores_dict[game_id]["away_line_scores"] = team_linescores
 
-    return linescores_dict  # Always returns a dictionary, even if empty
+    return linescores_dict, events_data  # Always returns a dictionary, even if empty
 
 def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
     team_rows = []
