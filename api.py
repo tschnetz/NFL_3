@@ -24,12 +24,17 @@ def fetch_espn_bet_odds(game_id):
     return {"error": "Failed to fetch odds"}
 
 def fetch_games_by_day():
-    today = datetime.now().strftime('%Y%m%d')
-    querystring = {"day": today}
-    response = requests.get(SCOREBOARD_URL, headers=HEADERS, params=querystring)
+    response = requests.get(SCOREBOARD_URL, headers=HEADERS)
+    print("Response status:", response.status_code)
+    print("Response headers:", response.headers)
+    print("Response content:", response.text[:500])  # Log first 500 characters of response for inspection
+
     if response.status_code == 200:
         return response.json()
+    else:
+        print("Failed to fetch games data.")
     return {"error": "Failed to fetch games"}
+
 
 def get_scoring_plays(game_id):
     querystring = {"id": game_id}
