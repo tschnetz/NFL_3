@@ -4,7 +4,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 
 layout = dbc.Container([
-    dcc.Interval(id='interval-scores', interval=15 * 1000, n_intervals=0),
+    dcc.Interval(id='interval-scores', interval=10 * 1000, n_intervals=0),
     dcc.Interval(id='interval-odds', interval=60 * 60 * 1000, n_intervals=0),
     dcc.Store(id='init-complete', data=False),
     dcc.Store(id='in-progress-flag', data=False),
