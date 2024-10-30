@@ -1,7 +1,7 @@
 # layout.py
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from utils import create_standings
+from utils import create_standings, hex_to_rgba
 
 # Get the prepared standings data
 standings_df = create_standings()
@@ -92,17 +92,17 @@ standings_layout = dbc.Container([
     dbc.Card([
         dbc.CardBody(
             html.Div([
-                html.Img(src="assets/nfl-3644686_1280.webp", height="50px", style={"marginRight": "10px"}),
-                html.H1("NFL Standings", style={
+                html.Img(src="assets/nfl-3644686_1280.webp", height="50px", style={"marginRight": "15px"}),
+                html.H1("Current Standings", style={
                     "display": "inline-block",
                     "verticalAlign": "middle",
                     "color": "white",
-                    "padding": "15px",
-                    "backgroundColor": "#1E3A5F",
+                    "padding": "10px 20px",
+                    # "backgroundColor": "#1E3A5F",
                     "borderRadius": "8px",
                     "fontSize": "2.5rem",
                     "fontWeight": "bold",
-                    "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.3)"
+                    "margin": "0"
                 })
             ], style={"display": "flex", "alignItems": "center", "justifyContent": "center"})
         )
@@ -138,7 +138,7 @@ standings_layout = dbc.Container([
                     [
                         # Header Row with Overall and Division section headers
                         html.Tr([
-                            html.Th("Team", style={"padding": "5px", "textAlign": "left"}),
+                            html.Th(),
                             html.Th("Overall", colSpan="4", style={
                                 "textAlign": "center",
                                 "fontWeight": "bold",
@@ -168,7 +168,6 @@ standings_layout = dbc.Container([
                         ])
                     ] + [
                         html.Tr([
-                            # Team cell with logo, name, and semi-transparent background color
                             html.Td(
                                 [html.Img(src=row["logo"], style={"height": "40px", "marginRight": "10px"}),
                                  html.Span(row["display_name"], style={"color": row["color"], "fontWeight": "bold"})],
@@ -176,19 +175,53 @@ standings_layout = dbc.Container([
                                     "display": "flex",
                                     "alignItems": "center",
                                     "padding": "5px",
-                                    "backgroundColor": f"{row['color']}33"  # Adding transparency
+                                    "backgroundColor": hex_to_rgba(row["color"], alpha=0.2),
+                                    "borderRadius": "5px"
                                 }
                             ),
-                            # Overall section cells with semi-transparent team color background
-                            html.Td(row["wins"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
-                            html.Td(row["losses"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
-                            html.Td(row["ties"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
-                            html.Td(f"{row['overall_win%']:.3f}", style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
-                            # Division section cells with semi-transparent team color background
-                            html.Td(row["division_wins"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
-                            html.Td(row["division_losses"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
-                            html.Td(row["division_ties"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
-                            html.Td(f"{row['division_win%']:.3f}", style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"})
+                            # Overall section with background
+                            html.Td(row["wins"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",
+                            }),
+                            html.Td(row["losses"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",
+                            }),
+                            html.Td(row["ties"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",
+                            }),
+                            html.Td(f"{row['overall_win%']:.3f}", style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",
+                            }),
+
+                            # Division section with background
+                            html.Td(row["division_wins"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
+                            }),
+                            html.Td(row["division_losses"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
+                            }),
+                            html.Td(row["division_ties"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
+                            }),
+                            html.Td(f"{row['division_win%']:.3f}", style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
+                            }),
                         ])
                         for _, row in division_df.iterrows()
                     ],
@@ -231,18 +264,17 @@ standings_layout = dbc.Container([
                     [
                         # Header Row with Overall and Division section headers
                         html.Tr([
-                            html.Th("Team", style={"padding": "5px", "textAlign": "left"}),
+                            html.Th(),
                             html.Th("Overall", colSpan="4", style={
                                 "textAlign": "center",
                                 "fontWeight": "bold",
-                                "backgroundColor": "#f0f0f0",
-                                "borderTopLeftRadius": "8px",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",                                "borderTopLeftRadius": "8px",
                                 "borderTopRightRadius": "8px"
                             }),
                             html.Th("Division", colSpan="4", style={
                                 "textAlign": "center",
                                 "fontWeight": "bold",
-                                "backgroundColor": "#e0e0e0",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
                                 "borderTopLeftRadius": "8px",
                                 "borderTopRightRadius": "8px"
                             })
@@ -261,22 +293,60 @@ standings_layout = dbc.Container([
                         ])
                     ] + [
                         html.Tr([
-                            # Team cell with logo and name
                             html.Td(
                                 [html.Img(src=row["logo"], style={"height": "40px", "marginRight": "10px"}),
                                  html.Span(row["display_name"], style={"color": row["color"], "fontWeight": "bold"})],
-                                style={"display": "flex", "alignItems": "center", "padding": "5px"}
+                                style={
+                                    "display": "flex",
+                                    "alignItems": "center",
+                                    "padding": "5px",
+                                    "backgroundColor": hex_to_rgba(row["color"], alpha=0.2),
+                                    "borderRadius": "5px"
+                                }
                             ),
-                            # Overall section cells
-                            html.Td(row["wins"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
-                            html.Td(row["losses"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
-                            html.Td(row["ties"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
-                            html.Td(f"{row['overall_win%']:.3f}", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
-                            # Division section cells
-                            html.Td(row["division_wins"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
-                            html.Td(row["division_losses"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
-                            html.Td(row["division_ties"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
-                            html.Td(f"{row['division_win%']:.3f}", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"})
+                            # Overall section with background
+                            html.Td(row["wins"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",
+                            }),
+                            html.Td(row["losses"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",
+                            }),
+                            html.Td(row["ties"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",
+                            }),
+                            html.Td(f"{row['overall_win%']:.3f}", style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(220, 220, 220, 0.5)",
+                            }),
+
+                            # Division section with background
+                            html.Td(row["division_wins"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
+                            }),
+                            html.Td(row["division_losses"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
+                            }),
+                            html.Td(row["division_ties"], style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
+                            }),
+                            html.Td(f"{row['division_win%']:.3f}", style={
+                                "padding": "5px",
+                                "textAlign": "center",
+                                "backgroundColor": "rgba(255, 255, 255, 0.5)",
+                            }),
                         ])
                         for _, row in division_df.iterrows()
                     ],
