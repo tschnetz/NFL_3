@@ -1,0 +1,218 @@
+{
+    "id": "str",
+    "uid": "str",
+    "date": "str",
+    "name": "str",
+    "shortName": "str",
+    "season": {
+        "year": "int",
+        "type": "int",
+        "slug": "str"
+    },
+    "week": {
+        "number": "int"
+    },
+    "competitions": [
+        {
+            "id": "str",
+            "uid": "str",
+            "date": "str",
+            "attendance": "int",
+            "type": {
+                "id": "str",
+                "abbreviation": "str"
+            },
+            "timeValid": "bool",
+            "neutralSite": "bool",
+            "conferenceCompetition": "bool",
+            "playByPlayAvailable": "bool",
+            "recent": "bool",
+            "venue": {
+                "id": "str",
+                "fullName": "str",
+                "address": {
+                    "city": "str",
+                    "state": "str"
+                },
+                "indoor": "bool"
+            },
+            "competitors": [
+                {
+                    "id": "str",
+                    "uid": "str",
+                    "type": "str",
+                    "order": "int",
+                    "homeAway": "str",
+                    "winner": "bool",
+                    "team": {
+                        "id": "str",
+                        "uid": "str",
+                        "location": "str",
+                        "name": "str",
+                        "abbreviation": "str",
+                        "displayName": "str",
+                        "shortDisplayName": "str",
+                        "color": "str",
+                        "alternateColor": "str",
+                        "isActive": "bool",
+                        "venue": {
+                            "id": "str"
+                        },
+                        "links": [
+                            {
+                                "rel": [
+                                    "str"
+                                ],
+                                "href": "str",
+                                "text": "str",
+                                "isExternal": "bool",
+                                "isPremium": "bool"
+                            }
+                        ],
+                        "logo": "str"
+                    },
+                    "score": "str",
+                    "linescores": [
+                        {
+                            "value": "int"
+                        }
+                    ],
+                    "statistics": [],
+                    "records": [
+                        {
+                            "name": "str",
+                            "abbreviation": "str",
+                            "type": "str",
+                            "summary": "str"
+                        }
+                    ]
+                }
+            ],
+            "notes": [],
+            "status": {
+                "clock": "int",
+                "displayClock": "str",
+                "period": "int",
+                "type": {
+                    "id": "str",
+                    "name": "str",
+                    "state": "str",
+                    "completed": "bool",
+                    "description": "str",
+                    "detail": "str",
+                    "shortDetail": "str"
+                },
+                "isTBDFlex": "bool"
+            },
+            "broadcasts": [
+                {
+                    "market": "str",
+                    "names": [
+                        "str"
+                    ]
+                }
+            ],
+            "leaders": [
+                {
+                    "name": "str",
+                    "displayName": "str",
+                    "shortDisplayName": "str",
+                    "abbreviation": "str",
+                    "leaders": [
+                        {
+                            "displayValue": "str",
+                            "value": "int",
+                            "athlete": {
+                                "id": "str",
+                                "fullName": "str",
+                                "displayName": "str",
+                                "shortName": "str",
+                                "links": [
+                                    {
+                                        "rel": [
+                                            "str"
+                                        ],
+                                        "href": "str"
+                                    }
+                                ],
+                                "headshot": "str",
+                                "jersey": "str",
+                                "position": {
+                                    "abbreviation": "str"
+                                },
+                                "team": {
+                                    "id": "str"
+                                },
+                                "active": "bool"
+                            },
+                            "team": {
+                                "id": "str"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "format": {
+                "regulation": {
+                    "periods": "int"
+                }
+            },
+            "startDate": "str",
+            "broadcast": "str",
+            "geoBroadcasts": [
+                {
+                    "type": {
+                        "id": "str",
+                        "shortName": "str"
+                    },
+                    "market": {
+                        "id": "str",
+                        "type": "str"
+                    },
+                    "media": {
+                        "shortName": "str",
+                        "logo": "str",
+                        "darkLogo": "str"
+                    },
+                    "lang": "str",
+                    "region": "str"
+                }
+            ],
+            "highlights": [],
+            "headlines": [
+                {
+                    "type": "str",
+                    "description": "str",
+                    "shortLinkText": "str"
+                }
+            ]
+        }
+    ],
+    "links": [
+        {
+            "language": "str",
+            "rel": [
+                "str"
+            ],
+            "href": "str",
+            "text": "str",
+            "shortText": "str",
+            "isExternal": "bool",
+            "isPremium": "bool"
+        }
+    ],
+    "status": {
+        "clock": "int",
+        "displayClock": "str",
+        "period": "int",
+        "type": {
+            "id": "str",
+            "name": "str",
+            "state": "str",
+            "completed": "bool",
+            "description": "str",
+            "detail": "str",
+            "shortDetail": "str"
+        }
+    }
+}

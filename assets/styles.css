@@ -30,33 +30,38 @@ body {
 
 /* Styling for individual game rows */
 .game-row {
-  border-bottom: 1px solid #ddd;
-  padding: 15px 0;
-  transition: background-color 0.2s;
+    transition: box-shadow 0.3s ease-in-out;
+    background-color: rgba(255, 255, 255, 1); /* Light background with transparency */
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px; /* Rounded corners */
 }
 
 /* Hover effect for game rows */
 .game-row:hover {
-  background-color: rgba(255, 255, 255, 0.2);  /* Subtle hover effect */
+  background-color: rgba(255, 255, 255, 0.8);  /* Subtle hover effect */
 }
 
 /* Button styling */
 button.dash-bootstrap {
-  background-color: rgba(255, 255, 255, 0.7) !important;
+  background-color: rgba(255, 255, 255, 1) !important;
   border: none !important;
   color: black !important;
   padding: 15px 20px !important;
   text-align: left !important;
   width: 100% !important;
   cursor: pointer !important;
-  transition: background-color 0.3s ease !important;
+  transition: box-shadow 0.7s ease, background-color 0.7s ease !important;
   display: block !important;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Adds shadow for 3D effect */
+  border-radius: 8px; /* Rounded corners */
 }
 
 /* Hover effect for buttons */
 button.dash-bootstrap:hover {
   background: linear-gradient(90deg, var(--team-home-color), var(--team-away-color)) !important;
   color: white !important;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.50); /* Enhanced shadow on hover */
 }
 
 /* Footer styling for last updated time */
@@ -106,14 +111,85 @@ h1  {
   box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Active style for the selected nav button */
-.nav-link-custom-active {
-  background-color: white; /* Solid white for active state */
-  color: black;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Stronger shadow */
-  transform: translateY(-2px); /* Slight lift for 3D effect */
+/* Custom styling for the dropdown */
+.custom-dropdown .Select-control {
+    border: none !important;
+    background-color: rgba(255, 255, 255, 0.9) !important; /* Slightly more opaque for better readability */
+    border-radius: 8px !important;
+    width: 300px; /* Adjust width if needed */
+    padding: 5px 10px;
+    text-align: center;
+    color: #1E3A5F; /* Text color */
 }
 
-.nav-link-custom-active:hover {
-  background-color: white; /* Keep solid white on hover if active */
+/* Center text within the dropdown */
+.custom-dropdown .Select-placeholder,
+.custom-dropdown .Select-value {
+    font-size: 18px;
+    color: #1E3A5F;
+    text-align: center;
 }
+
+/* Additional padding for dropdown toggle */
+.custom-dropdown .Select-arrow {
+    margin-left: 10px;
+}
+
+/* Remove focus outline for a cleaner look */
+.custom-dropdown .Select-control:focus {
+    outline: none !important;
+}
+
+/* Styling the main record cell container */
+.record-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd; /* Optional: cell-like appearance */
+    padding: 5px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 100%;
+}
+
+/* Styling for each record section (Overall and Division) */
+.record-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5px; /* Adds spacing between sections */
+}
+
+/* Styling for the headings */
+.record-heading {
+    font-weight: bold;
+    font-size: 0.85em;
+    color: #333;
+    margin-bottom: 3px;
+}
+
+/* Specific styling for each record entry */
+.overall-record, .division-record {
+    font-size: 0.9em;
+    padding: 2px 0;
+}
+
+/* Example color for division record text */
+.division-record {
+    color: #555;
+}
+
+/* Space between columns */
+.overall-column, .division-column {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Optional */
+.table-section-header {
+    font-weight: bold;
+    text-align: center;
+}
+
+

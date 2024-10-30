@@ -1,11 +1,12 @@
 # layout.py
-from dash import dcc
-from dash import html
+from dash import dcc, html
 import dash_bootstrap_components as dbc
 from utils import create_standings
 
 # Get the prepared standings data
 standings_df = create_standings()
+
+# Main layout with styled header and centered dropdown
 main_layout = dbc.Container([
     dcc.Interval(id='interval-scores', interval=10 * 1000, n_intervals=0),
     dcc.Interval(id='interval-odds', interval=60 * 60 * 1000, n_intervals=0),
@@ -16,36 +17,57 @@ main_layout = dbc.Container([
     dcc.Store(id='scores-data', data=[]),
     dcc.Store(id='nfl-events-data', data={}),
 
+    # Header with NFL Logo and Title for Main Layout
+    dbc.Card([
+        dbc.CardBody(
+            html.Div([
+                html.Img(src="assets/nfl-3644686_1280.webp", height="50px", style={"marginRight": "15px"}),
+                html.H1("NFL Games", style={
+                    "display": "inline-block",
+                    "verticalAlign": "middle",
+                    "color": "white",
+                    "padding": "10px 20px",
+                    # "backgroundColor": "#1E3A5F",
+                    "borderRadius": "8px",
+                    "fontSize": "2.5rem",
+                    "fontWeight": "bold",
+                    "margin": "0"
+                })
+            ], style={"display": "flex", "alignItems": "center", "justifyContent": "center"})
+        )
+    ], style={
+        "backgroundColor": "#1E3A5F",
+        "marginBottom": "20px",
+        "borderRadius": "8px",
+        "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.3)",
+        "padding": "10px"
+    }),
+
     dbc.Row(
         dbc.Col(
-            html.Div(
-                [
-                    html.Img(src="assets/nfl-3644686_1280.webp", height="50px", style={"marginRight": "10px"}),
-                    html.H1("NFL Games", style={"display": "inline-block", "verticalAlign": "middle"}),
-                ],
-                style={"display": "flex", "alignItems": "center", "justifyContent": "center"}
+            dcc.Dropdown(
+                id='week-selector',
+                options=[],
+                placeholder="Select a week",
+                style={
+                    "width": "100%",
+                    "textAlign": "center",
+                    "fontSize": "18px",
+                    "padding": "3px",
+                    "border": "none",
+                    "borderRadius": "8px",
+                    # "backgroundColor": "#FFFFFF",  # Fully opaque white background
+                    "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.1)",  # Subtle shadow
+                }
             ),
-            width=12,
-            className="text-center"
+            width=6,  # Adjust width as needed
+            style={"display": "flex", "justifyContent": "center"}  # Center the dropdown in the column
         ),
-        style={'marginBottom': '20px'}
+        justify="center",
+        style={"marginBottom": "20px"}
     ),
 
-    dbc.Row(dbc.Col(dcc.Dropdown(
-        id='week-selector',
-        options=[],
-        placeholder="Select a week",
-        style={
-            'padding': '3px',
-            'textAlign': 'center',
-            'textAlignLast': 'center',
-            'fontSize': '20px',
-            'color': 'black',
-            'alignItems': 'center',
-            'justifyContent': 'center'
-        },
-    ), width=12)),
-
+    # Game information loading section
     dbc.Row(
         dbc.Col(
             dcc.Loading(
@@ -55,58 +77,220 @@ main_layout = dbc.Container([
             ),
             width=12
         )
-    ),
+    )
 ], fluid=True)
 
-# Standings layout
-standings_layout = dbc.Container([
-    html.H1("NFL Standings", style={"textAlign": "center"}),
 
-    # Division tables wrapped in dbc.Card
+# Standings layout
+# Filter divisions based on AFC or NFC
+afc_divisions = standings_df[standings_df["division_name"].str.startswith("AFC")]
+nfc_divisions = standings_df[standings_df["division_name"].str.startswith("NFC")]
+
+# Standings layout with AFC and NFC subheadings
+standings_layout = dbc.Container([
+    # Header with NFL Logo and Title
+    dbc.Card([
+        dbc.CardBody(
+            html.Div([
+                html.Img(src="assets/nfl-3644686_1280.webp", height="50px", style={"marginRight": "10px"}),
+                html.H1("NFL Standings", style={
+                    "display": "inline-block",
+                    "verticalAlign": "middle",
+                    "color": "white",
+                    "padding": "15px",
+                    "backgroundColor": "#1E3A5F",
+                    "borderRadius": "8px",
+                    "fontSize": "2.5rem",
+                    "fontWeight": "bold",
+                    "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.3)"
+                })
+            ], style={"display": "flex", "alignItems": "center", "justifyContent": "center"})
+        )
+    ], style={
+        "backgroundColor": "#1E3A5F",
+        "marginBottom": "20px",
+        "borderRadius": "8px"
+    }),
+
+    # AFC Subheading with background and logo
+    dbc.Card([
+        dbc.CardBody([
+            html.Div([
+                html.Img(src="/assets/afc.png", height="40px", style={"marginRight": "10px"}),
+                html.H2("AFC", style={"display": "inline-block", "verticalAlign": "middle", "marginBottom": "0"}),
+            ], style={"display": "flex", "alignItems": "center", "color": "white"})
+        ])
+    ], style={
+        "backgroundColor": "#003f5c",
+        "padding": "10px",
+        "marginTop": "20px",
+        "marginBottom": "10px",
+        "borderRadius": "8px",
+        "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.2)"
+    }),
+
+    # AFC Division tables
     *[
         dbc.Card([
-            dbc.CardHeader(html.H2(division_df["division_name"].iloc[0], style={"textAlign": "left"})),
+            dbc.CardHeader(html.H3(division_df["division_name"].iloc[0], style={"textAlign": "left"})),
             dbc.CardBody([
                 html.Table(
-                    [html.Tr([
-                        html.Th("Team", style={"padding": "5px", "textAlign": "left"}),
-                        html.Th("Wins", style={"padding": "5px"}),
-                        html.Th("Losses", style={"padding": "5px"}),
-                        html.Th("Ties", style={"padding": "5px"}),
-                        html.Th("Div. Wins", style={"padding": "5px"}),
-                        html.Th("Div. Losses", style={"padding": "5px"}),
-                        html.Th("Div. Ties", style={"padding": "5px"}),
-                        html.Th("Overall Win %", style={"padding": "5px"}),
-                        html.Th("Division Win %", style={"padding": "5px"})
-                    ])] +
                     [
+                        # Header Row with Overall and Division section headers
                         html.Tr([
+                            html.Th("Team", style={"padding": "5px", "textAlign": "left"}),
+                            html.Th("Overall", colSpan="4", style={
+                                "textAlign": "center",
+                                "fontWeight": "bold",
+                                "backgroundColor": "#f0f0f0",
+                                "borderTopLeftRadius": "8px",
+                                "borderTopRightRadius": "8px"
+                            }),
+                            html.Th("Division", colSpan="4", style={
+                                "textAlign": "center",
+                                "fontWeight": "bold",
+                                "backgroundColor": "#e0e0e0",
+                                "borderTopLeftRadius": "8px",
+                                "borderTopRightRadius": "8px"
+                            })
+                        ]),
+                        # Subheader Row for Overall and Division details
+                        html.Tr([
+                            html.Th(),
+                            html.Th("W", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Th("L", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Th("T", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Th("Win %", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Th("W", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Th("L", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Th("T", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Th("Win %", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"})
+                        ])
+                    ] + [
+                        html.Tr([
+                            # Team cell with logo, name, and semi-transparent background color
                             html.Td(
-                                [html.Img(src=row["logo"], style={"height": "30px", "marginRight": "10px"}),
+                                [html.Img(src=row["logo"], style={"height": "40px", "marginRight": "10px"}),
                                  html.Span(row["display_name"], style={"color": row["color"], "fontWeight": "bold"})],
-                                style={"display": "flex", "alignItems": "center", "padding": "5px"}
+                                style={
+                                    "display": "flex",
+                                    "alignItems": "center",
+                                    "padding": "5px",
+                                    "backgroundColor": f"{row['color']}33"  # Adding transparency
+                                }
                             ),
-                            html.Td(row["wins"], style={"padding": "5px", "textAlign": "center"}),
-                            html.Td(row["losses"], style={"padding": "5px", "textAlign": "center"}),
-                            html.Td(row["ties"], style={"padding": "5px", "textAlign": "center"}),
-                            html.Td(row["division_wins"], style={"padding": "5px", "textAlign": "center"}),
-                            html.Td(row["division_losses"], style={"padding": "5px", "textAlign": "center"}),
-                            html.Td(row["division_ties"], style={"padding": "5px", "textAlign": "center"}),
-                            html.Td(f"{row['overall_win%']:.3f}", style={"padding": "5px", "textAlign": "center"}),
-                            html.Td(f"{row['division_win%']:.3f}", style={"padding": "5px", "textAlign": "center"})
+                            # Overall section cells with semi-transparent team color background
+                            html.Td(row["wins"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
+                            html.Td(row["losses"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
+                            html.Td(row["ties"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
+                            html.Td(f"{row['overall_win%']:.3f}", style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
+                            # Division section cells with semi-transparent team color background
+                            html.Td(row["division_wins"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
+                            html.Td(row["division_losses"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
+                            html.Td(row["division_ties"], style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"}),
+                            html.Td(f"{row['division_win%']:.3f}", style={"padding": "5px", "textAlign": "center", "backgroundColor": f"{row['color']}33"})
                         ])
                         for _, row in division_df.iterrows()
                     ],
-                    style={"width": "100%", "borderCollapse": "collapse", "marginTop": "10px"}
+                    style={"width": "100%", "borderCollapse": "collapse", "marginTop": "10px", "fontSize": "24px"}
                 )
             ])
         ], style={
             "marginBottom": "20px",
             "boxShadow": "0px 2px 4px rgba(0, 0, 0, 0.1)",
-            "backgroundColor": "rgba(255, 255, 255, 0.8)",  # Light color with opacity for transparency
-            "borderRadius": "8px",  # Rounded corners
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            "borderRadius": "8px",
             "padding": "10px"
         })
-        for division_id, division_df in standings_df.groupby("division_id")
+        for division_name, division_df in afc_divisions.groupby("division_name")
+    ],
+
+    # NFC Subheading with background and logo
+    dbc.Card([
+        dbc.CardBody([
+            html.Div([
+                html.Img(src="/assets/nfc.png", height="40px", style={"marginRight": "10px"}),
+                html.H2("NFC", style={"display": "inline-block", "verticalAlign": "middle", "marginBottom": "0"}),
+            ], style={"display": "flex", "alignItems": "center", "color": "white"})
+        ])
+    ], style={
+        "backgroundColor": "#2f4b7c",
+        "padding": "10px",
+        "marginTop": "20px",
+        "marginBottom": "10px",
+        "borderRadius": "8px",
+        "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.2)"
+    }),
+
+    # NFC Division tables
+    *[
+        dbc.Card([
+            dbc.CardHeader(html.H3(division_df["division_name"].iloc[0], style={"textAlign": "left"})),
+            dbc.CardBody([
+                html.Table(
+                    [
+                        # Header Row with Overall and Division section headers
+                        html.Tr([
+                            html.Th("Team", style={"padding": "5px", "textAlign": "left"}),
+                            html.Th("Overall", colSpan="4", style={
+                                "textAlign": "center",
+                                "fontWeight": "bold",
+                                "backgroundColor": "#f0f0f0",
+                                "borderTopLeftRadius": "8px",
+                                "borderTopRightRadius": "8px"
+                            }),
+                            html.Th("Division", colSpan="4", style={
+                                "textAlign": "center",
+                                "fontWeight": "bold",
+                                "backgroundColor": "#e0e0e0",
+                                "borderTopLeftRadius": "8px",
+                                "borderTopRightRadius": "8px"
+                            })
+                        ]),
+                        # Subheader Row for Overall and Division details
+                        html.Tr([
+                            html.Th(),
+                            html.Th("W", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Th("L", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Th("T", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Th("Win %", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Th("W", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Th("L", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Th("T", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Th("Win %", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"})
+                        ])
+                    ] + [
+                        html.Tr([
+                            # Team cell with logo and name
+                            html.Td(
+                                [html.Img(src=row["logo"], style={"height": "40px", "marginRight": "10px"}),
+                                 html.Span(row["display_name"], style={"color": row["color"], "fontWeight": "bold"})],
+                                style={"display": "flex", "alignItems": "center", "padding": "5px"}
+                            ),
+                            # Overall section cells
+                            html.Td(row["wins"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Td(row["losses"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Td(row["ties"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            html.Td(f"{row['overall_win%']:.3f}", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#f0f0f0"}),
+                            # Division section cells
+                            html.Td(row["division_wins"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Td(row["division_losses"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Td(row["division_ties"], style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"}),
+                            html.Td(f"{row['division_win%']:.3f}", style={"padding": "5px", "textAlign": "center", "backgroundColor": "#e0e0e0"})
+                        ])
+                        for _, row in division_df.iterrows()
+                    ],
+                    style={"width": "100%", "borderCollapse": "collapse", "marginTop": "10px", "fontSize": "24px"}
+                )
+            ])
+        ], style={
+            "marginBottom": "20px",
+            "boxShadow": "0px 2px 4px rgba(0, 0, 0, 0.1)",
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            "borderRadius": "8px",
+            "padding": "10px"
+        })
+        for division_name, division_df in nfc_divisions.groupby("division_name")
     ]
 ], fluid=True, style={"fontFamily": "Arial, sans-serif", "padding": "20px"})
+

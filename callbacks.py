@@ -53,6 +53,7 @@ def register_callbacks(app):
 
         return week_options, True, selected_value, data
 
+
     @app.callback(
         [Output('static-game-info', 'children'), Output('init-complete', 'data')],
         [Input('nfl-events-data', 'data'), Input('week-selector', 'value')]
@@ -163,11 +164,11 @@ def register_callbacks(app):
                     ], className="game-row", style={'padding': '10px'}),
                     id={'type': 'game-button', 'index': game_id},
                     n_clicks=0,
-                    color='light',
+                    color='medium',
                     className='dash-bootstrap',
                     style={
-                        '--team-home-color': home_color + '50',
-                        '--team-away-color': away_color + '50',
+                        '--team-home-color': home_color,
+                        '--team-away-color': away_color,
                         'width': '100%',
                         'textAlign': 'left'
                     },
@@ -178,6 +179,7 @@ def register_callbacks(app):
             games_info.append(html.Hr())
 
         return (games_info, True)
+
 
     @app.callback(
         [

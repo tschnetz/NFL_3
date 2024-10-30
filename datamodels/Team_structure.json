@@ -1,0 +1,26 @@
+{
+    "id": "str",
+    "uid": "str",
+    "slug": "str",
+    "abbreviation": "str",
+    "displayName": "str",
+    "shortDisplayName": "str",
+    "name": "str",
+    "nickname": "str",
+    "location": "str",
+    "color": "str",
+    "alternateColor": "str",
+    "isActive": "bool",
+    "isAllStar": "bool",
+    "logos": [
+        {
+            "href": "str",
+            "alt": "str",
+            "rel": [
+                "str"
+            ],
+            "width": "int",
+            "height": "int"
+        }
+    ]
+}

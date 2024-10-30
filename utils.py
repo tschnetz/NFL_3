@@ -14,6 +14,7 @@ def save_last_fetched_odds(last_fetched_odds):
     with open(ODDS_FILE_PATH, 'w') as f:
         json.dump(last_fetched_odds, f)
 
+
 def load_last_fetched_odds():
     """Load the last fetched odds from a JSON file."""
     try:
@@ -138,6 +139,7 @@ def line_scores():
 
     return linescores_dict, events_data  # Always returns a dictionary, even if empty
 
+
 def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
     team_rows = []
     for team, scores in [(home_team, home_line_scores), (away_team, away_line_scores)]:
@@ -165,6 +167,7 @@ def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
         'width': '100%', 'borderCollapse': 'collapse', 'backgroundColor': 'rgba(255, 255, 255, 0.5)',
         'borderRadius': '8px', 'padding': '10px', 'marginBottom': '20px'
     })
+
 
 def format_game_leaders(game_leaders):
     formatted_game_leaders = html.Div([
@@ -215,7 +218,6 @@ def format_scoring_play(scoring_plays):
         'marginBottom': '20px',
         'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)'
     })
-
 
 
 def get_unique_divisions(teams_df):
@@ -323,6 +325,7 @@ def get_teams():
     return pd.DataFrame(team_data)
 """
 
+
 def create_standings():
     teams_df = pd.read_json("data/teams.json")
     standings_df = pd.read_json("data/records.json")
@@ -337,7 +340,7 @@ def create_standings():
                 standings_df["wins"] + standings_df["losses"] + standings_df["ties"])
     standings_df["division_win%"] = standings_df["division_wins"] / (
                 standings_df["division_wins"] + standings_df["division_losses"] + standings_df["division_ties"])
-    standings_df = standings_df.sort_values(by=["division_id", "division_win%", "overall_win%"],
+    standings_df = standings_df.sort_values(by=["division_name", "overall_win%", "division_win%"],
                                             ascending=[True, False, False])
 
     return standings_df
