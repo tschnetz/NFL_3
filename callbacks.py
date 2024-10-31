@@ -7,13 +7,48 @@ import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from utils import load_last_fetched_odds, extract_game_info, line_scores
 from utils import format_line_score, format_game_leaders, format_scoring_play
-from api import fetch_nfl_events, fetch_games_by_day, get_scoring_plays
+from api import fetch_nfl_events, fetch_games_by_day, get_scoring_plays, fetch_current_odds
 
 last_fetched_odds = load_last_fetched_odds()
 # Flag to check if initial API call returned events
 initial_api_call_returned_events = True
 
+
 def register_callbacks(app):
+    @app.callback(
+        Output('interval-odds', 'n_intervals'),  # Dummy output to trigger the callback
+        [Input('interval-odds', 'n_intervals'),
+         Input('week-selector', 'value')],  # Trigger on scores update
+    )
+    def update_odds(n_intervals, week_index):
+        try:
+            # Fetch new odds data
+            new_odds = fetch_current_odds(week_index)
+
+            # Load current odds file
+            with open('data/last_fetched_odds.json', 'r') as odds_file:
+                last_fetched_odds = json.load(odds_file)
+
+            # Iterate over each game to update odds
+            for event in new_odds['events']:
+                game_id = event['id']  # Unique game identifier
+                # Extract odds information
+                if 'odds' in event['competitions'][0]:
+                    # print(f"Odds found for game {game_id}")
+                    odds_data = event['competitions'][0]['odds'][0]  # Assume first provider if multiple
+                    spread = odds_data.get('details')
+                    last_fetched_odds[game_id] = spread
+
+            # Save updated odds back to last_fetched_odds.json
+            with open('data/last_fetched_odds.json', 'w') as odds_file:
+                json.dump(last_fetched_odds, odds_file, indent=2)
+
+        except Exception as e:
+            print(f"Error updating odds: {e}")
+
+        return n_intervals  # Return current interval count to trigger update
+
+
     @app.callback(
         Output('week-selector', 'options'),
         Output('week-options-store', 'data'),
@@ -108,7 +143,6 @@ def register_callbacks(app):
             game_status = game_info['Game Status']
             home_id = game_info['Home Team ID']
             away_id = game_info['Away Team ID']
-
             home_team_extra_info = ""
             away_team_extra_info = ""
 
@@ -124,16 +158,16 @@ def register_callbacks(app):
             games_info.append(
                 dbc.Button(
                     dbc.Row([
-                        dbc.Col(html.Img(src=game_info['Home Team Logo'], height="60px"), width=1,
+                        dbc.Col(html.Img(src=game_info['Away Team Logo'], height="80px"), width=1,
                                 style={'textAlign': 'center'}),
                         dbc.Col(
                             html.Div([
-                                html.H4(game_info['Home Team'], style={'color': home_color}),
-                                html.P(f"{game_info['Home Team Record']}", style={'margin': '0', 'padding': '0'}),
-                                html.H3(home_score, id={'type': 'home-score', 'index': game_id},
-                                        style={'color': home_color, 'fontWeight': 'bold'}),
-                                html.H6(home_team_extra_info, id={'type': 'home-extra', 'index': game_id},
-                                        style={'color': home_color}),
+                                html.H4(game_info['Away Team'], style={'color': away_color}),
+                                html.P(f"{game_info['Away Team Record']}", style={'margin': '0', 'padding': '0'}),
+                                html.H3(home_score, id={'type': 'away-score', 'index': game_id},
+                                        style={'color': away_color, 'fontWeight': 'bold'}),
+                                html.H6(home_team_extra_info, id={'type': 'away-extra', 'index': game_id},
+                                        style={'color': away_color}),
                             ], style={'textAlign': 'center'}),
                             width=3
                         ),
@@ -151,16 +185,16 @@ def register_callbacks(app):
                         ),
                         dbc.Col(
                             html.Div([
-                                html.H4(game_info['Away Team'], style={'color': away_color}),
-                                html.P(f"{game_info['Away Team Record']}", style={'margin': '0', 'padding': '0'}),
-                                html.H3(away_score, id={'type': 'away-score', 'index': game_id},
-                                        style={'color': away_color, 'fontWeight': 'bold'}),
-                                html.H6(away_team_extra_info, id={'type': 'away-extra', 'index': game_id},
-                                        style={'color': away_color}),
+                                html.H4(game_info['Home Team'], style={'color': home_color}),
+                                html.P(f"{game_info['Home Team Record']}", style={'margin': '0', 'padding': '0'}),
+                                html.H3(away_score, id={'type': 'home-score', 'index': game_id},
+                                        style={'color': home_color, 'fontWeight': 'bold'}),
+                                html.H6(away_team_extra_info, id={'type': 'home-extra', 'index': game_id},
+                                        style={'color': home_color}),
                             ], style={'textAlign': 'center'}),
                             width=3
                         ),
-                        dbc.Col(html.Img(src=game_info['Away Team Logo'], height="60px"), width=1,
+                        dbc.Col(html.Img(src=game_info['Home Team Logo'], height="80px"), width=1,
                                 style={'textAlign': 'center'}),
                     ], className="game-row", style={'padding': '10px'}),
                     id={'type': 'game-button', 'index': game_id},
@@ -215,6 +249,7 @@ def register_callbacks(app):
         quarter_time_display = "Final" if game_status == "final" else f"{quarter} Qtr ● {time_remaining}"
 
         return home_score, away_score, quarter_time_display, home_team_extra_info, away_team_extra_info
+
 
     @app.callback(
         Output('scores-data', 'data'),

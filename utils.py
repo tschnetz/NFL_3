@@ -27,35 +27,17 @@ def load_last_fetched_odds():
 
 def fetch_espn_bet_odds(game_id, game_status, last_fetched_odds):
     """Fetch ESPN BET odds based on game status."""
-    if game_status == 'Scheduled':
-        print(f"Fetching ESPN BET odds for scheduled game ID: {game_id}")
-        # querystring = {"id": game_id}
-        # response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
-        odds_data = last_fetched_odds
 
-        for item in odds_data.get('items', []):
-            if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
-                last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
-                save_last_fetched_odds(last_fetched_odds)  # Save to file
-                return item.get('details', 'N/A')
-
-    elif game_id not in last_fetched_odds:
+    if game_id not in last_fetched_odds:
         # Odds not available in the dictionary, fetch odds regardless of the game status
-        print(f"Fetching ESPN BET odds for game ID: {game_id} as it is not in last fetched odds.")
-        # querystring = {"id": game_id}
-        # response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
         odds_data = fetch_odds(game_id)
-
         for item in odds_data.get('items', []):
                 if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
                     last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
                     save_last_fetched_odds()  # Save to file
-                    return item.get('details', 'N/A')
     else:
         # Return the last fetched odds if the game is in progress or final
-        # print(f"Returning last fetched odds for game ID: {game_id}")
         return last_fetched_odds[game_id]  # Return last fetched odds if available
-
     return None  # Return None if no odds are found
 
 

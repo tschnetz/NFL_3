@@ -1,8 +1,10 @@
+import json
+
 from cache_config import cache  # Import cache directly
 import requests
 from datetime import datetime
-from config import (HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL,
-                    SCORING_PLAYS_URL, TEAMS_URL, RECORD_URL, DIVISION_URL)
+from config import (HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL,
+                    SCOREBOARD_WEEK_URL, TEAMS_URL, RECORD_URL, DIVISION_URL)
 
 
 @cache.memoize(timeout=1800)  # Cache for 30 minutes
@@ -20,6 +22,17 @@ def fetch_nfl_events():
 
 
 @cache.memoize(timeout=1800)  # Cache for 30 minutes
+def fetch_current_odds(week):
+    week -= 3
+    print(f"Fetching current odds for week {week}")
+    querystring = {"year":"2024","type":"2","week":week}
+    print(f"Requesting URL: {SCOREBOARD_WEEK_URL}")
+    response = requests.get(SCOREBOARD_WEEK_URL, headers=HEADERS, params=querystring)
+    if response.status_code == 200:
+        return response.json()
+    return {"error": "Failed to fetch games"}
+
+
 def fetch_odds(game_id):
     querystring = {"id": game_id}
     try:
