@@ -116,7 +116,7 @@ standings_layout = dbc.Container([
     dbc.Card([
         dbc.CardBody([
             html.Div([
-                html.Img(src="/assets/afc.webp", height="40px", style={"marginRight": "10px"}),
+                html.Img(src="/assets/AFC_logo.webp", height="40px", style={"marginRight": "10px"}),
                 html.H2("AFC", style={"display": "inline-block", "verticalAlign": "middle", "marginBottom": "0"}),
             ], style={"display": "flex", "alignItems": "center", "color": "white"})
         ])
@@ -244,7 +244,7 @@ standings_layout = dbc.Container([
     dbc.Card([
         dbc.CardBody([
             html.Div([
-                html.Img(src="/assets/nfc.webp", height="40px", style={"marginRight": "10px"}),
+                html.Img(src="/assets/NFC_logo.webp", height="40px", style={"marginRight": "10px"}),
                 html.H2("NFC", style={"display": "inline-block", "verticalAlign": "middle", "marginBottom": "0"}),
             ], style={"display": "flex", "alignItems": "center", "color": "white"})
         ])
