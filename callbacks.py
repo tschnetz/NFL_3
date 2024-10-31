@@ -10,6 +10,7 @@ from utils import format_line_score, format_game_leaders, format_scoring_play
 from api import fetch_nfl_events, fetch_games_by_day, get_scoring_plays, fetch_current_odds
 
 last_fetched_odds = load_last_fetched_odds()
+
 # Flag to check if initial API call returned events
 initial_api_call_returned_events = True
 
@@ -174,6 +175,8 @@ def register_callbacks(app):
                         dbc.Col(
                             html.Div([
                                 # html.H5(game_info['Game Status']),
+                                html.H6(game_status, id={'type': 'game-status', 'index': game_id},
+                                        style={'fontWeight': 'bold'}),
                                 html.H6(game_info['Odds']) if game_info['Odds'] else "",
                                 html.P(game_info['Start Date (EST)'], style={'margin': '0', 'padding': '0'}),
                                 html.P(f"{game_info['Location']} - {game_info['Network']}",
@@ -222,7 +225,8 @@ def register_callbacks(app):
             Output({'type': 'away-score', 'index': MATCH}, 'children'),
             Output({'type': 'quarter-time', 'index': MATCH}, 'children'),
             Output({'type': 'home-extra', 'index': MATCH}, 'children'),
-            Output({'type': 'away-extra', 'index': MATCH}, 'children')
+            Output({'type': 'away-extra', 'index': MATCH}, 'children'),
+            Output({'type': 'game-status', 'index': MATCH}, 'className')
         ],
         [Input('scores-data', 'data')],
         [State({'type': 'game-button', 'index': MATCH}, 'value')]
@@ -231,9 +235,9 @@ def register_callbacks(app):
         game_data = next((game for game in scores_data if game['game_id'] == game_id), None)
 
         if not game_data:
-            return [dash.no_update] * 5
+            return [dash.no_update] * 6
 
-        game_status = game_data.get('status', 'In Progress').lower()
+        game_status = game_data.get('Status', 'In Progress')
         home_score = game_data.get('Home Team Score', "")
         away_score = game_data.get('Away Team Score', "")
         quarter = game_data.get('Quarter', "")
@@ -248,7 +252,7 @@ def register_callbacks(app):
 
         quarter_time_display = "Final" if game_status == "final" else f"{quarter} Qtr ● {time_remaining}"
 
-        return home_score, away_score, quarter_time_display, home_team_extra_info, away_team_extra_info
+        return home_score, away_score, quarter_time_display, home_team_extra_info, away_team_extra_info, game_status
 
 
     @app.callback(
@@ -312,6 +316,7 @@ def register_callbacks(app):
 
             updated_game_data.append({
                 'game_id': game_id,
+                'Status': game_status,
                 'Home Team ID': home_team_id,
                 'Away Team ID': away_team_id,
                 'Home Team': home_team,

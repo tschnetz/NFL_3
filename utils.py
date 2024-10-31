@@ -1,7 +1,5 @@
 # utils.py
 import json
-import time
-
 from dash import dcc, html
 import pandas as pd
 import pytz
