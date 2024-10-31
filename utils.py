@@ -1,12 +1,13 @@
 # utils.py
 import json
+import time
+
 from dash import dcc, html
-import requests
 import pandas as pd
 import pytz
 from datetime import datetime, timezone
-from config import HEADERS, ODDS_URL, ODDS_FILE_PATH
-from api import fetch_nfl_events, fetch_teams, fetch_division, fetch_team_records
+from config import ODDS_FILE_PATH
+from api import fetch_nfl_events, fetch_odds
 
 
 def save_last_fetched_odds(last_fetched_odds):
@@ -27,28 +28,29 @@ def load_last_fetched_odds():
 def fetch_espn_bet_odds(game_id, game_status, last_fetched_odds):
     """Fetch ESPN BET odds based on game status."""
     if game_status == 'Scheduled':
-        # print(f"Fetching ESPN BET odds for scheduled game ID: {game_id}")
-        querystring = {"id": game_id}
-        response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
-        odds_data = response.json()
+        print(f"Fetching ESPN BET odds for scheduled game ID: {game_id}")
+        # querystring = {"id": game_id}
+        # response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
+        odds_data = last_fetched_odds
 
         for item in odds_data.get('items', []):
             if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
                 last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
                 save_last_fetched_odds(last_fetched_odds)  # Save to file
                 return item.get('details', 'N/A')
+
     elif game_id not in last_fetched_odds:
         # Odds not available in the dictionary, fetch odds regardless of the game status
-        # print(f"Fetching ESPN BET odds for game ID: {game_id} as it is not in last fetched odds.")
-        querystring = {"id": game_id}
-        response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
-        odds_data = response.json()
+        print(f"Fetching ESPN BET odds for game ID: {game_id} as it is not in last fetched odds.")
+        # querystring = {"id": game_id}
+        # response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
+        odds_data = fetch_odds(game_id)
 
         for item in odds_data.get('items', []):
-            if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
-                last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
-                save_last_fetched_odds()  # Save to file
-                return item.get('details', 'N/A')
+                if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
+                    last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
+                    save_last_fetched_odds()  # Save to file
+                    return item.get('details', 'N/A')
     else:
         # Return the last fetched odds if the game is in progress or final
         # print(f"Returning last fetched odds for game ID: {game_id}")
@@ -220,7 +222,7 @@ def format_scoring_play(scoring_plays):
     })
 
 
-def get_unique_divisions(teams_df):
+"""def get_unique_divisions(teams_df):
     division_dict = {}
 
     for _, team in teams_df.iterrows():
@@ -252,7 +254,7 @@ def get_unique_divisions(teams_df):
 
     return pd.DataFrame(division_records)
 
-
+"""
 """def get_records(teams_df):
     # Initialize list to store records for each team
     team_records = []
@@ -327,7 +329,7 @@ def get_teams():
 
 
 def create_standings():
-    teams_df = pd.read_json("data/teams.json")
+    # teams_df = pd.read_json("data/teams.json")
     standings_df = pd.read_json("data/records.json")
     divisions_df = pd.read_json("data/divisions.json")
 
@@ -342,6 +344,7 @@ def create_standings():
                 standings_df["division_wins"] + standings_df["division_losses"] + standings_df["division_ties"])
     standings_df = standings_df.sort_values(by=["division_name", "overall_win%", "division_win%"],
                                             ascending=[True, False, False])
+
 
     return standings_df
 

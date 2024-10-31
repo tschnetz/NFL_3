@@ -144,7 +144,8 @@ standings_layout = dbc.Container([
                                 "fontWeight": "bold",
                                 "backgroundColor": "#f0f0f0",
                                 "borderTopLeftRadius": "8px",
-                                "borderTopRightRadius": "8px"
+                                "borderTopRightRadius": "8px",
+                                "boxShadow": "0px 2px 4px rgba(0, 0, 0, 0.1)",
                             }),
                             html.Th("Division", colSpan="4", style={
                                 "textAlign": "center",
@@ -176,7 +177,8 @@ standings_layout = dbc.Container([
                                     "alignItems": "center",
                                     "padding": "5px",
                                     "backgroundColor": hex_to_rgba(row["color"], alpha=0.2),
-                                    "borderRadius": "5px"
+                                    "borderRadius": "5px",
+                                    "boxShadow": "0px 2px 4px rgba(0, 0, 0, 0.1)",
                                 }
                             ),
                             # Overall section with background
@@ -301,7 +303,8 @@ standings_layout = dbc.Container([
                                     "alignItems": "center",
                                     "padding": "5px",
                                     "backgroundColor": hex_to_rgba(row["color"], alpha=0.2),
-                                    "borderRadius": "5px"
+                                    "borderRadius": "5px",
+                                    "boxShadow": "0px 2px 4px rgba(0, 0, 0, 0.1)",
                                 }
                             ),
                             # Overall section with background

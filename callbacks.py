@@ -1,3 +1,4 @@
+# callbacks.py
 import dash
 import json
 from dash.dependencies import Input, Output, State, MATCH
@@ -6,11 +7,11 @@ import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from utils import load_last_fetched_odds, extract_game_info, line_scores
 from utils import format_line_score, format_game_leaders, format_scoring_play
-from api import fetch_nfl_events, fetch_espn_bet_odds, fetch_games_by_day, get_scoring_plays
+from api import fetch_nfl_events, fetch_games_by_day, get_scoring_plays
 
 last_fetched_odds = load_last_fetched_odds()
 # Flag to check if initial API call returned events
-initial_api_call_returned_events = None
+initial_api_call_returned_events = True
 
 def register_callbacks(app):
     @app.callback(

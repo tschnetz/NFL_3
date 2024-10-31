@@ -20,7 +20,7 @@ def fetch_nfl_events():
 
 
 @cache.memoize(timeout=1800)  # Cache for 30 minutes
-def fetch_espn_bet_odds(game_id):
+def fetch_odds(game_id):
     querystring = {"id": game_id}
     try:
         print(f"Requesting URL: {ODDS_URL}")
