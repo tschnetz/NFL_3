@@ -146,7 +146,7 @@ def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
         ])),
         html.Tbody(team_rows)
     ], style={
-        'width': '100%', 'borderCollapse': 'collapse', 'backgroundColor': 'rgba(255, 255, 255, 0.5)',
+        'width': '50%', 'borderCollapse': 'collapse', 'backgroundColor': 'rgba(255, 255, 255, 0.5)',
         'borderRadius': '8px', 'padding': '10px', 'marginBottom': '20px'
     })
 
