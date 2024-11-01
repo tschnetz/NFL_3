@@ -165,9 +165,9 @@ def register_callbacks(app):
                             html.Div([
                                 html.H4(game_info['Away Team'], style={'color': away_color, 'fontWeight': 'bold'}),
                                 html.P(f"{game_info['Away Team Record']}", style={'margin': '0', 'padding': '0'}),
-                                html.H3(home_score, id={'type': 'away-score', 'index': game_id},
+                                html.H3(away_score, id={'type': 'away-score', 'index': game_id},
                                         style={'color': away_color, 'fontWeight': 'bold'}),
-                                html.H6(home_team_extra_info, id={'type': 'away-extra', 'index': game_id},
+                                html.H6(away_team_extra_info, id={'type': 'away-extra', 'index': game_id},
                                         style={'color': away_color}),
                             ], style={'textAlign': 'center'}),
                             width=3
@@ -191,9 +191,9 @@ def register_callbacks(app):
                             html.Div([
                                 html.H4(game_info['Home Team'], style={'color': home_color, 'fontWeight': 'bold'}),
                                 html.P(f"{game_info['Home Team Record']}", style={'margin': '0', 'padding': '0'}),
-                                html.H3(away_score, id={'type': 'home-score', 'index': game_id},
+                                html.H3(home_score, id={'type': 'home-score', 'index': game_id},
                                         style={'color': home_color, 'fontWeight': 'bold'}),
-                                html.H6(away_team_extra_info, id={'type': 'home-extra', 'index': game_id},
+                                html.H6(home_team_extra_info, id={'type': 'home-extra', 'index': game_id},
                                         style={'color': home_color}),
                             ], style={'textAlign': 'center'}),
                             width=3
@@ -259,6 +259,7 @@ def register_callbacks(app):
     @app.callback(
         Output('scores-data', 'data'),
         Output('in-progress-flag', 'data', allow_duplicate=True),
+        Output('interval-scores', 'n_intervals'),
         [Input('interval-scores', 'n_intervals'), Input('init-complete', 'data')],
         [State('scores-data', 'data')],
         prevent_initial_call=True
@@ -267,17 +268,17 @@ def register_callbacks(app):
         global initial_api_call_returned_events
 
         if not init_complete:
-            return dash.no_update, dash.no_update
+            return dash.no_update * 3
 
         # Check if the initial API call did not return events
         if initial_api_call_returned_events is False:
-            return dash.no_update, False
+            return dash.no_update, False , n_intervals
 
         games_data = fetch_games_by_day()
 
         if not games_data or not games_data.get('events'):
             initial_api_call_returned_events = False
-            return dash.no_update, False
+            return dash.no_update, False, n_intervals
 
         # Set the flag to True if events are found
         initial_api_call_returned_events = True
@@ -330,9 +331,9 @@ def register_callbacks(app):
             })
 
         if prev_scores_data == updated_game_data:
-            return dash.no_update, games_in_progress
+            return dash.no_update, games_in_progress, n_intervals
 
-        return updated_game_data, games_in_progress
+        return updated_game_data, games_in_progress, n_intervals
 
 
     @app.callback(
