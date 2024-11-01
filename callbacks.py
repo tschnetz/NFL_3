@@ -163,7 +163,7 @@ def register_callbacks(app):
                                 style={'textAlign': 'center'}),
                         dbc.Col(
                             html.Div([
-                                html.H4(game_info['Away Team'], style={'color': away_color}),
+                                html.H4(game_info['Away Team'], style={'color': away_color, 'fontWeight': 'bold'}),
                                 html.P(f"{game_info['Away Team Record']}", style={'margin': '0', 'padding': '0'}),
                                 html.H3(home_score, id={'type': 'away-score', 'index': game_id},
                                         style={'color': away_color, 'fontWeight': 'bold'}),
@@ -189,7 +189,7 @@ def register_callbacks(app):
                         ),
                         dbc.Col(
                             html.Div([
-                                html.H4(game_info['Home Team'], style={'color': home_color}),
+                                html.H4(game_info['Home Team'], style={'color': home_color, 'fontWeight': 'bold'}),
                                 html.P(f"{game_info['Home Team Record']}", style={'margin': '0', 'padding': '0'}),
                                 html.H3(away_score, id={'type': 'home-score', 'index': game_id},
                                         style={'color': home_color, 'fontWeight': 'bold'}),
