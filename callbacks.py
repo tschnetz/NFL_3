@@ -255,7 +255,6 @@ def register_callbacks(app):
 
         return home_score, away_score, quarter_time_display, home_team_extra_info, away_team_extra_info, game_status
 
-
     @app.callback(
         Output('scores-data', 'data'),
         Output('in-progress-flag', 'data', allow_duplicate=True),
@@ -267,76 +266,89 @@ def register_callbacks(app):
     def update_game_data(n_intervals, init_complete, prev_scores_data):
         global initial_api_call_returned_events
 
-        print("update_game_data callback triggered")
-        print(f"init_complete: {init_complete}")
+        print("update_game_data callback triggered", flush=True)
+        print(f"init_complete: {init_complete}", flush=True)
 
         if not init_complete:
-            return dash.no_update * 3
+            print("Init not complete, returning no update", flush=True)
+            return dash.no_update, dash.no_update, n_intervals
 
-        # Check if the initial API call did not return events
         if initial_api_call_returned_events is False:
-            return dash.no_update, False , n_intervals
-
-        games_data = fetch_games_by_day()
-
-        if not games_data or not games_data.get('events'):
-            initial_api_call_returned_events = False
+            print("Initial API call did not return events, returning no update", flush=True)
             return dash.no_update, False, n_intervals
 
-        # Set the flag to True if events are found
-        initial_api_call_returned_events = True
+        try:
+            games_data = fetch_games_by_day()
+            print("Fetched games data:", games_data, flush=True)
 
-        updated_game_data = []
-        games_in_progress = False
+            if not games_data or not games_data.get('events'):
+                initial_api_call_returned_events = False
+                print("No events found in games data", flush=True)
+                return dash.no_update, False, n_intervals
 
-        for game in games_data.get('events', []):
-            game_id = game.get('id')
-            competitions = game.get('competitions', [])
+            initial_api_call_returned_events = True
+            updated_game_data = []
+            games_in_progress = False
 
-            if not competitions:
-                continue
+            for game in games_data.get('events', []):
+                game_id = game.get('id')
+                competitions = game.get('competitions', [])
 
-            status_info = competitions[0].get('status', {})
-            game_status = status_info.get('type', {}).get('description', 'N/A')
+                if not competitions:
+                    print(f"Skipping game {game_id} as it has no competitions data", flush=True)
+                    continue
 
-            if game_status in ["Scheduled", "Final"]:
-                continue
-            else:
-                games_in_progress = True
+                status_info = competitions[0].get('status', {})
+                game_status = status_info.get('type', {}).get('description', 'N/A')
+                print(f"Game {game_id} status: {game_status}", flush=True)
 
-            home_team = competitions[0]['competitors'][0]['team']['displayName']
-            away_team = competitions[0]['competitors'][1]['team']['displayName']
-            home_score = competitions[0]['competitors'][0].get('score', 'N/A')
-            away_score = competitions[0]['competitors'][1].get('score', 'N/A')
+                if game_status in ["Scheduled", "Final"]:
+                    print(f"Skipping game {game_id} as its status is '{game_status}'", flush=True)
+                    continue
+                else:
+                    games_in_progress = True
 
-            home_team_id = competitions[0]['competitors'][0]['team']['id']
-            away_team_id = competitions[0]['competitors'][1]['team']['id']
-            quarter = '' if game_status == "Final" else status_info.get('period', 'N/A')
-            time_remaining = '' if game_status == "Final" else status_info.get('displayClock', 'N/A')
+                home_team = competitions[0]['competitors'][0]['team']['displayName']
+                away_team = competitions[0]['competitors'][1]['team']['displayName']
+                home_score = competitions[0]['competitors'][0].get('score', 'N/A')
+                away_score = competitions[0]['competitors'][1].get('score', 'N/A')
 
-            situation = competitions[0].get('situation', {})
-            possession = situation.get('downDistanceText', 'N/A')
-            possession_team = situation.get('possession', 'N/A')
+                home_team_id = competitions[0]['competitors'][0]['team']['id']
+                away_team_id = competitions[0]['competitors'][1]['team']['id']
+                quarter = '' if game_status == "Final" else status_info.get('period', 'N/A')
+                time_remaining = '' if game_status == "Final" else status_info.get('displayClock', 'N/A')
 
-            updated_game_data.append({
-                'game_id': game_id,
-                'Status': game_status,
-                'Home Team ID': home_team_id,
-                'Away Team ID': away_team_id,
-                'Home Team': home_team,
-                'Away Team': away_team,
-                'Home Team Score': home_score,
-                'Away Team Score': away_score,
-                'Quarter': quarter,
-                'Time Remaining': time_remaining,
-                'Down Distance': possession,
-                'Possession': possession_team,
-            })
+                situation = competitions[0].get('situation', {})
+                possession = situation.get('downDistanceText', 'N/A')
+                possession_team = situation.get('possession', 'N/A')
 
-        if prev_scores_data == updated_game_data:
-            return dash.no_update, games_in_progress, n_intervals
+                updated_game_data.append({
+                    'game_id': game_id,
+                    'Status': game_status,
+                    'Home Team ID': home_team_id,
+                    'Away Team ID': away_team_id,
+                    'Home Team': home_team,
+                    'Away Team': away_team,
+                    'Home Team Score': home_score,
+                    'Away Team Score': away_score,
+                    'Quarter': quarter,
+                    'Time Remaining': time_remaining,
+                    'Down Distance': possession,
+                    'Possession': possession_team,
+                })
 
-        return updated_game_data, games_in_progress, n_intervals
+            print("Updated game data prepared:", updated_game_data, flush=True)
+
+            if prev_scores_data == updated_game_data:
+                print("No change in game data, returning no update", flush=True)
+                return dash.no_update, games_in_progress, n_intervals
+
+            print("Returning updated game data", flush=True)
+            return updated_game_data, games_in_progress, n_intervals
+
+        except Exception as e:
+            print(f"Error fetching game data: {e}", flush=True)
+            return dash.no_update, dash.no_update, n_intervals
 
 
     @app.callback(
