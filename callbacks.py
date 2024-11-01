@@ -35,7 +35,6 @@ def register_callbacks(app):
                 game_id = event['id']  # Unique game identifier
                 # Extract odds information
                 if 'odds' in event['competitions'][0]:
-                    # print(f"Odds found for game {game_id}")
                     odds_data = event['competitions'][0]['odds'][0]  # Assume first provider if multiple
                     spread = odds_data.get('details')
                     last_fetched_odds[game_id] = spread
@@ -233,13 +232,12 @@ def register_callbacks(app):
         [State({'type': 'game-button', 'index': MATCH}, 'value')]
     )
     def display_dynamic_game_info(scores_data, game_id):
-        print("display_dynamic_game_info callback triggered", flush=True)
         game_data = next((game for game in scores_data if game['game_id'] == game_id), None)
 
         if not game_data:
             return [dash.no_update] * 6
 
-        game_status = game_data.get('Status', 'In Progress')
+        game_status = game_data.get('Status', '')
         home_score = game_data.get('Home Team Score', "")
         away_score = game_data.get('Away Team Score', "")
         quarter = game_data.get('Quarter', "")
@@ -267,24 +265,17 @@ def register_callbacks(app):
     def update_game_data(n_intervals, init_complete, prev_scores_data):
         global initial_api_call_returned_events
 
-        print("update_game_data callback triggered", flush=True)
-        print(f"init_complete: {init_complete}", flush=True)
-
         if not init_complete:
-            print("Init not complete, returning no update", flush=True)
             return dash.no_update, dash.no_update, n_intervals
 
         if initial_api_call_returned_events is False:
-            print("Initial API call did not return events, returning no update", flush=True)
             return dash.no_update, False, n_intervals
 
         try:
             games_data = fetch_games_by_day()
-            print("Fetched games data:", games_data, flush=True)
 
             if not games_data or not games_data.get('events'):
                 initial_api_call_returned_events = False
-                print("No events found in games data", flush=True)
                 return dash.no_update, False, n_intervals
 
             initial_api_call_returned_events = True
@@ -296,15 +287,12 @@ def register_callbacks(app):
                 competitions = game.get('competitions', [])
 
                 if not competitions:
-                    print(f"Skipping game {game_id} as it has no competitions data", flush=True)
                     continue
 
                 status_info = competitions[0].get('status', {})
                 game_status = status_info.get('type', {}).get('description', 'N/A')
-                print(f"Game {game_id} status: {game_status}", flush=True)
 
                 if game_status in ["Scheduled", "Final"]:
-                    print(f"Skipping game {game_id} as its status is '{game_status}'", flush=True)
                     continue
                 else:
                     games_in_progress = True
@@ -338,17 +326,13 @@ def register_callbacks(app):
                     'Possession': possession_team,
                 })
 
-            print("Updated game data prepared:", updated_game_data, flush=True)
 
             if prev_scores_data == updated_game_data:
-                print("No change in game data, returning no update", flush=True)
                 return dash.no_update, games_in_progress, n_intervals
 
-            print("Returning updated game data", flush=True)
             return updated_game_data, games_in_progress, n_intervals
 
         except Exception as e:
-            print(f"Error fetching game data: {e}", flush=True)
             return dash.no_update, dash.no_update, n_intervals
 
 
