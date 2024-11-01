@@ -150,7 +150,7 @@ def register_callbacks(app):
             if game_status.lower() == "final":
                 home_score = game_info['Home Team Score']
                 away_score = game_info['Away Team Score']
-                quarter_time_display = "FINAL"
+                quarter_time_display = ""
             else:
                 home_score = ""
                 away_score = ""
@@ -177,12 +177,13 @@ def register_callbacks(app):
                                 # html.H5(game_info['Game Status']),
                                 html.H6(game_status, id={'type': 'game-status', 'index': game_id},
                                         style={'fontWeight': 'bold'}),
+                                html.H5(quarter_time_display, id={'type': 'quarter-time', 'index': game_id},
+                                        style={'fontWeight': 'bold'}),
                                 html.H6(game_info['Odds']) if game_info['Odds'] else "",
                                 html.P(game_info['Start Date (EST)'], style={'margin': '0', 'padding': '0'}),
                                 html.P(f"{game_info['Location']} - {game_info['Network']}",
                                        style={'margin': '0', 'padding': '0'}),
-                                html.H6(quarter_time_display, id={'type': 'quarter-time', 'index': game_id},
-                                        style={'fontWeight': 'bold'}),
+
                             ], style={'textAlign': 'center'}),
                             width=4
                         ),
