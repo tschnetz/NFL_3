@@ -29,10 +29,11 @@ def fetch_espn_bet_odds(game_id, game_status, last_fetched_odds):
     if game_id not in last_fetched_odds:
         # Odds not available in the dictionary, fetch odds regardless of the game status
         odds_data = fetch_odds(game_id)
-        for item in odds_data.get('items', []):
-                if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
-                    last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
-                    save_last_fetched_odds()  # Save to file
+        if odds_data:
+            for item in odds_data.get('items', []):
+                    if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
+                        last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
+                        save_last_fetched_odds()  # Save to file
     else:
         # Return the last fetched odds if the game is in progress or final
         return last_fetched_odds[game_id]  # Return last fetched odds if available
@@ -130,7 +131,7 @@ def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
         total_score = sum(scores)
 
         team_row = html.Tr([
-            html.Td(html.Img(src=team_logo, height="50px")),
+            html.Td(html.Img(src=team_logo, height="50px", style={'marginLeft': '10px'})),
             html.Td(team_name, style={'fontWeight': 'bold', 'font-size': '14'}),
             *[html.Td(str(score), style={'textAlign': 'center'}) for score in scores],
             html.Td(str(total_score), style={'fontWeight': 'bold', 'textAlign': 'center'})
