@@ -8,7 +8,7 @@ standings_df = create_standings()
 
 # Main layout with styled header and centered dropdown
 main_layout = dbc.Container([
-    dcc.Interval(id='interval-scores', interval=5 * 1000, n_intervals=0),
+    dcc.Interval(id='interval-scores', interval=15 * 1000, n_intervals=0),
     dcc.Interval(id='interval-odds', interval=300 * 1000, n_intervals=0),
     dcc.Store(id='init-complete', data=False),
     dcc.Store(id='in-progress-flag', data=False),
