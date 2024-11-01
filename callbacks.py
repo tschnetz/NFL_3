@@ -6,7 +6,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from utils import load_last_fetched_odds, extract_game_info, create_line_scores, format_line_score, format_game_leaders, format_scoring_play
-from api import fetch_nfl_events, fetch_games_by_day, get_scoring_plays, fetch_current_odds
+from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds
 
 last_fetched_odds = load_last_fetched_odds()
 initial_api_call_returned_events = True
@@ -362,7 +362,7 @@ def register_callbacks(app):
                 "away_line_scores": []
             })
 
-            scoring_plays = get_scoring_plays(game_id)
+            scoring_plays = fetch_scoring_plays(game_id)
             game_data = next((event for event in nfl_events_data.get("events", []) if event.get("id") == game_id), None)
 
             if game_data:

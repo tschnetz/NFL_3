@@ -29,9 +29,7 @@ def load_last_fetched_odds():
         return {}
 
 
-def fetch_espn_bet_odds(game_id, game_status, last_fetched_odds):
-    """Fetch ESPN BET odds based on game status."""
-
+def get_game_odds(game_id, game_status, last_fetched_odds):
     if game_id not in last_fetched_odds:
         # Odds not available in the dictionary, fetch odds regardless of the game status
         odds_data = fetch_odds(game_id)
@@ -61,7 +59,7 @@ def extract_game_info(event, last_fetched_odds):
 
     # Fetch odds based on game status (fetch live odds if scheduled, retain last odds otherwise)
     game_id = event.get('id')
-    odds = fetch_espn_bet_odds(game_id, game_status, last_fetched_odds)
+    odds = get_game_odds(game_id, game_status, last_fetched_odds)
 
     # Extract overall records from the statistics
     home_team_record = event['competitions'][0]['competitors'][0]['records'][0]['summary']

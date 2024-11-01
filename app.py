@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 from flask import Flask
 from config import PORT
 from callbacks import register_callbacks
-from cache_config import cache  # Import cache configuration
+from cache_config import cache
 
 
 # Initialize Flask server
@@ -12,13 +12,8 @@ server = Flask(__name__)
 # Initialize Dash app with Flask server
 app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP], title="NFL Games", use_pages=True)
 
-# Initialize diskcache as the backend for caching
+# Initialize cache and clear
 cache.init_app(app.server)
-# Configure cache
-
-
-
-# Clear cache at the start
 with app.server.app_context():
     cache.clear()
 
@@ -38,10 +33,8 @@ app.layout = dbc.Container([
     dash.page_container  # Display selected page content
 ], fluid=True)
 
-
 # Register callbacks
 register_callbacks(app)
-
 
 # Run Dash server
 if __name__ == "__main__":

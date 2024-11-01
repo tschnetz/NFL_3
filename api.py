@@ -51,7 +51,7 @@ def fetch_games_by_day():
     return {"error": "Failed to fetch games"}
 
 
-def get_scoring_plays(game_id):
+def fetch_scoring_plays(game_id):
     querystring = {"id": game_id}
     try:
         response = requests.get(SCORING_PLAYS_URL, headers=HEADERS, params=querystring)
