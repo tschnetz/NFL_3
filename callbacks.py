@@ -296,6 +296,8 @@ def register_callbacks(app):
 
             if game_status in ["Scheduled", "Final"]:
                 continue
+            else:
+                games_in_progress = True
 
             home_team = competitions[0]['competitors'][0]['team']['displayName']
             away_team = competitions[0]['competitors'][1]['team']['displayName']
@@ -310,9 +312,6 @@ def register_callbacks(app):
             situation = competitions[0].get('situation', {})
             possession = situation.get('downDistanceText', 'N/A')
             possession_team = situation.get('possession', 'N/A')
-
-            if game_status.lower() == "in progress":
-                games_in_progress = True
 
             updated_game_data.append({
                 'game_id': game_id,

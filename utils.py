@@ -130,9 +130,9 @@ def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
         total_score = sum(scores)
 
         team_row = html.Tr([
-            html.Td(html.Img(src=team_logo, height="30px")),
-            html.Td(team_name),
-            *[html.Td(str(score), style={'textAlign': 'right'}) for score in scores],
+            html.Td(html.Img(src=team_logo, height="50px")),
+            html.Td(team_name, style={'fontWeight': 'bold', 'font-size': '14'}),
+            *[html.Td(str(score), style={'textAlign': 'center'}) for score in scores],
             html.Td(str(total_score), style={'fontWeight': 'bold', 'textAlign': 'center'})
         ])
         team_rows.append(team_row)
@@ -140,14 +140,16 @@ def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
     return html.Table([
         html.Thead(html.Tr([
             html.Th(""), html.Th(""),
-            html.Th("Q1", style={'textAlign': 'right'}), html.Th("Q2", style={'textAlign': 'right'}),
-            html.Th("Q3", style={'textAlign': 'right'}), html.Th("Q4", style={'textAlign': 'right'}),
+            html.Th("Q1", style={'textAlign': 'center'}), html.Th("Q2", style={'textAlign': 'center'}),
+            html.Th("Q3", style={'textAlign': 'center'}), html.Th("Q4", style={'textAlign': 'center'}),
             html.Th("Total", style={'textAlign': 'center'})
         ])),
         html.Tbody(team_rows)
     ], style={
         'width': '50%', 'borderCollapse': 'collapse', 'backgroundColor': 'rgba(255, 255, 255, 0.5)',
-        'borderRadius': '8px', 'padding': '10px', 'marginBottom': '20px'
+        'borderRadius': '8px', 'padding': '10px', 'marginBottom': '20px', 'marginTop': '20px',
+        'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        'marginLeft': 'auto', 'marginRight': 'auto',
     })
 
 
