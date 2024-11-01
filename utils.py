@@ -105,8 +105,8 @@ def line_scores():
         # Only include regular season games with a final status
         if season_type == 2 and game_status == "final":  # Regular season and completed games only
             linescores_dict[game_id] = {
-                "home_line_scores": [],
-                "away_line_scores": []
+                "away_line_scores": [],
+                "home_line_scores": []
             }
 
             # Loop through teams to classify home and away team scores
@@ -114,17 +114,17 @@ def line_scores():
                 for competitor in competition.get("competitors", []):
                     team_linescores = [score.get("value") for score in competitor.get("linescores", [])]
 
-                    if competitor.get("homeAway") == "home":
-                        linescores_dict[game_id]["home_line_scores"] = team_linescores
-                    elif competitor.get("homeAway") == "away":
+                    if competitor.get("homeAway") == "away":
                         linescores_dict[game_id]["away_line_scores"] = team_linescores
+                    elif competitor.get("homeAway") == "home":
+                        linescores_dict[game_id]["home_line_scores"] = team_linescores
 
     return linescores_dict, events_data  # Always returns a dictionary, even if empty
 
 
 def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
     team_rows = []
-    for team, scores in [(home_team, home_line_scores), (away_team, away_line_scores)]:
+    for team, scores in [(away_team, away_line_scores), (home_team, home_line_scores)]:
         team_logo = team["team"]["logo"]
         team_name = team["team"]["displayName"]
         total_score = sum(scores)
