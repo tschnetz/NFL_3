@@ -267,6 +267,9 @@ def register_callbacks(app):
     def update_game_data(n_intervals, init_complete, prev_scores_data):
         global initial_api_call_returned_events
 
+        print("update_game_data callback triggered")
+        print(f"init_complete: {init_complete}")
+
         if not init_complete:
             return dash.no_update * 3
 
