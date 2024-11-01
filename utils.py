@@ -1,17 +1,17 @@
 # utils.py
 import json
-from dash import dcc, html
+from dash import html
 import pandas as pd
 import pytz
 from datetime import datetime, timezone
 from config import ODDS_FILE_PATH
-from api import fetch_nfl_events, fetch_odds
+from api import fetch_nfl_events, fetch_odds, fetch_division, fetch_team_records, fetch_teams
 
 
 def save_last_fetched_odds(last_fetched_odds):
     """Save the last fetched odds to a JSON file."""
     with open(ODDS_FILE_PATH, 'w') as f:
-        json.dump(last_fetched_odds, f)
+        json.dump(last_fetched_odds, f, indent=2)
 
 
 def load_last_fetched_odds():
@@ -33,7 +33,7 @@ def fetch_espn_bet_odds(game_id, game_status, last_fetched_odds):
             for item in odds_data.get('items', []):
                     if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
                         last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
-                        save_last_fetched_odds()  # Save to file
+                        save_last_fetched_odds(last_fetched_odds)  # Save to file
     else:
         # Return the last fetched odds if the game is in progress or final
         return last_fetched_odds[game_id]  # Return last fetched odds if available
@@ -205,7 +205,7 @@ def format_scoring_play(scoring_plays):
     })
 
 
-"""def get_unique_divisions(teams_df):
+def get_unique_divisions(teams_df):
     division_dict = {}
 
     for _, team in teams_df.iterrows():
@@ -233,12 +233,12 @@ def format_scoring_play(scoring_plays):
 
     # Save to data/divisions.json
     with open("data/divisions.json", "w") as f:
-        json.dump(division_records, f)
+        json.dump(division_records, f, indent=2)
 
     return pd.DataFrame(division_records)
 
-"""
-"""def get_records(teams_df):
+
+def get_records(teams_df):
     # Initialize list to store records for each team
     team_records = []
 
@@ -289,7 +289,7 @@ def format_scoring_play(scoring_plays):
     # Convert to DataFrame
     # Save to data/records.json
     with open("data/records.json", "w") as f:
-        json.dump(team_records, f)
+        json.dump(team_records, f, indent=2)
     return pd.DataFrame(team_records)
 
 
@@ -306,15 +306,16 @@ def get_teams():
     ]
     # Save to data/teams.json
     with open("data/teams.json", "w") as f:
-        json.dump(team_data, f)
+        json.dump(team_data, f, indent=2)
     return pd.DataFrame(team_data)
-"""
 
 
 def create_standings():
-    # teams_df = pd.read_json("data/teams.json")
+    # Toggle standing_df to rebuild records json files
+    # standings_df = get_records(teams_df)
     standings_df = pd.read_json("data/records.json")
     divisions_df = pd.read_json("data/divisions.json")
+
 
     # Merge and clean up columns
     standings_df = standings_df.merge(divisions_df, how='left', left_on='id', right_on='team_id')
