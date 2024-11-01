@@ -8,8 +8,14 @@ from config import ODDS_FILE_PATH
 from api import fetch_nfl_events, fetch_odds, fetch_division, fetch_team_records, fetch_teams
 
 
+# Helper function to convert hex to rgba string format
+def hex_to_rgba(hex_color, alpha=0.2):
+    hex_color = hex_color.lstrip('#')
+    r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    return f"rgba({r}, {g}, {b}, {alpha})"
+
+
 def save_last_fetched_odds(last_fetched_odds):
-    """Save the last fetched odds to a JSON file."""
     with open(ODDS_FILE_PATH, 'w') as f:
         json.dump(last_fetched_odds, f, indent=2)
 
@@ -87,7 +93,7 @@ def extract_game_info(event, last_fetched_odds):
     }
 
 
-def line_scores():
+def create_line_scores():
     # Retrieve the cached NFL events data
     events_data = fetch_nfl_events()
 
@@ -331,10 +337,3 @@ def create_standings():
 
 
     return standings_df
-
-
-# Function to convert hex to rgba string format
-def hex_to_rgba(hex_color, alpha=0.2):
-    hex_color = hex_color.lstrip('#')
-    r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-    return f"rgba({r}, {g}, {b}, {alpha})"

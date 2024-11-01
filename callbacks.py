@@ -5,13 +5,10 @@ from dash.dependencies import Input, Output, State, MATCH
 from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
-from utils import load_last_fetched_odds, extract_game_info, line_scores
-from utils import format_line_score, format_game_leaders, format_scoring_play
+from utils import load_last_fetched_odds, extract_game_info, create_line_scores, format_line_score, format_game_leaders, format_scoring_play
 from api import fetch_nfl_events, fetch_games_by_day, get_scoring_plays, fetch_current_odds
 
 last_fetched_odds = load_last_fetched_odds()
-
-# Flag to check if initial API call returned events
 initial_api_call_returned_events = True
 
 
@@ -216,7 +213,7 @@ def register_callbacks(app):
             games_info.append(html.Div(id={'type': 'scoring-plays', 'index': game_id}, children=[]))
             games_info.append(html.Hr())
 
-        return (games_info, True)
+        return games_info, True
 
 
     @app.callback(
@@ -253,6 +250,7 @@ def register_callbacks(app):
         quarter_time_display = "Final" if game_status == "final" else f"{quarter} Qtr ● {time_remaining}"
 
         return home_score, away_score, quarter_time_display, home_team_extra_info, away_team_extra_info, game_status
+
 
     @app.callback(
         Output('scores-data', 'data'),
@@ -358,7 +356,7 @@ def register_callbacks(app):
         # Check if this is a request to show data (odd n_clicks)
         if n_clicks_list[triggered_button_index] % 2 == 1:
             # Only fetch and format data when displaying
-            all_line_scores, nfl_events_data = line_scores()
+            all_line_scores, nfl_events_data = create_line_scores()
             game_line_scores = all_line_scores.get(game_id, {
                 "home_line_scores": [],
                 "away_line_scores": []
