@@ -57,6 +57,14 @@ def extract_game_info(event, last_fetched_odds):
     # Get the game status (e.g., Scheduled, In Progress, Final)
     game_status = event['status']['type']['description']
 
+    # if game_status = 'final', extract headlines.description from competitions
+    if game_status.lower() == 'final':
+        headlines = event['competitions'][0].get('headlines', [])  # Get headlines, or an empty list if not found
+        game_headline = headlines[0].get('shortLinkText') if headlines else None  # Get description if headlines exist
+    else:
+        game_headline = None
+
+
     # Fetch odds based on game status (fetch live odds if scheduled, retain last odds otherwise)
     game_id = event.get('id')
     odds = get_game_odds(game_id, game_status, last_fetched_odds)
@@ -87,7 +95,8 @@ def extract_game_info(event, last_fetched_odds):
         'Quarter': event.get('status', {}).get('period', None),
         'Time Remaining': event.get('status', {}).get('displayClock', None),
         'Home Team Record': home_team_record,  # Added home team record
-        'Away Team Record': away_team_record  # Added away team record
+        'Away Team Record': away_team_record,  # Added away team record
+        'Game Headline': game_headline  # Added game headline'
     }
 
 

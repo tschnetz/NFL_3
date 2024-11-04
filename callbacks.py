@@ -142,6 +142,7 @@ def register_callbacks(app):
             away_id = game_info['Away Team ID']
             home_team_extra_info = ""
             away_team_extra_info = ""
+            game_headline = game_info['Game Headline']
 
             if game_status.lower() == "final":
                 home_score = game_info['Home Team Score']
@@ -166,7 +167,7 @@ def register_callbacks(app):
                                 html.H6(away_team_extra_info, id={'type': 'away-extra', 'index': game_id},
                                         style={'color': away_color}),
                             ], style={'textAlign': 'center'}),
-                            width=3
+                            width=3,
                         ),
                         dbc.Col(
                             html.Div([
@@ -179,7 +180,6 @@ def register_callbacks(app):
                                 html.P(game_info['Start Date (EST)'], style={'margin': '0', 'padding': '0'}),
                                 html.P(f"{game_info['Location']} - {game_info['Network']}",
                                        style={'margin': '0', 'padding': '0'}),
-
                             ], style={'textAlign': 'center'}),
                             width=4
                         ),
@@ -196,6 +196,19 @@ def register_callbacks(app):
                         ),
                         dbc.Col(html.Img(src=game_info['Home Team Logo'], height="80px"), width=1,
                                 style={'textAlign': 'center'}),
+                        dbc.Col(
+                            html.Div(
+                                game_info['Game Headline'],
+                                style={
+                                    'width': '100%',
+                                    'textAlign': 'center',
+                                    'fontStyle': 'italic',
+                                    'fontSize': '1.0em',
+                                    'marginTop': '10px',
+                                }
+                            ),
+                            width=12  # Adjust width as needed
+                        ),
                     ], className="game-row", style={'padding': '10px'}),
                     id={'type': 'game-button', 'index': game_id},
                     n_clicks=0,
