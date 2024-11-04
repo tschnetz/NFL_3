@@ -60,6 +60,15 @@ button.dash-bootstrap:hover {
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.50); /* Enhanced shadow on hover */
 }
 
+/* CSS class for consistent section styling */
+.section-container {
+    padding: 20px;          /* Internal spacing within the section */
+    margin: 10px 0;         /* Vertical spacing between sections */
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background for contrast */
+    border-radius: 8px;     /* Rounded corners for a card-like effect */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
 /* Footer styling for last updated time */
 footer {
   text-align: center;

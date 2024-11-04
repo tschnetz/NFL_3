@@ -159,11 +159,10 @@ def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
             html.Th("Total", style={'textAlign': 'center'})
         ])),
         html.Tbody(team_rows)
-    ], style={
-        'width': '50%', 'borderCollapse': 'collapse', 'backgroundColor': 'rgba(255, 255, 255, 0.5)',
-        'borderRadius': '8px', 'padding': '10px', 'marginBottom': '20px', 'marginTop': '20px',
-        'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)',
-        'marginLeft': 'auto', 'marginRight': 'auto',
+    ], className="section-container", style={
+        'width': '50%',             # Specific width for the boxscore section
+        'marginLeft': 'auto',       # Center-align the narrower boxscore
+        'marginRight': 'auto'
     })
 
 
@@ -178,10 +177,7 @@ def format_game_leaders(game_leaders):
             ], style={'display': 'flex', 'alignItems': 'center', 'padding': '5px 0'})
             for leader in game_leaders for player in leader.get('leaders', [])
         ]
-    ], style={
-        'backgroundColor': 'rgba(255, 255, 255, 0.3)', 'borderRadius': '8px',
-        'padding': '10px', 'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)'
-    })
+    ], className="section-container")  # Applying the CSS class here
 
     if not formatted_game_leaders.children:
         formatted_game_leaders.children = [html.Div("No leaders data available", style={'color': 'gray'})]
@@ -209,13 +205,7 @@ def format_scoring_play(scoring_plays):
     return html.Div([
         html.H6("Scoring Plays", style={'fontWeight': 'bold', 'paddingBottom': '10px'}),
         *formatted_plays  # Unpack the list of individual formatted plays
-    ], style={
-        'backgroundColor': 'rgba(255, 255, 255, 0.3)',  # Transparent background
-        'borderRadius': '8px',
-        'padding': '10px',
-        'marginBottom': '20px',
-        'boxShadow': '0px 2px 4px rgba(0, 0, 0, 0.1)'
-    })
+    ], className="section-container")  # Applying the CSS class here
 
 
 def get_unique_divisions(teams_df):
