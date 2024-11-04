@@ -1,21 +1,17 @@
 /* Body styles for the football field background */
+
 body {
-  background: repeating-linear-gradient(
-    90deg,  /* Horizontal stripes */
-    #76c57b,  /* Dark green color for the grass */
-    #76c57b 150px,  /* Width of the dark green stripe (wider field stripe) */
-    white 150px,  /* Start the white stripe after 150px */
-    white 160px  /* Make the white stripe (yard line) thin, only 10px */
-  );
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-image: url('football_field.jpg'); /* Replace with your image path */
+  background-size: cover;           /* Ensure the image covers the whole screen */
+  background-position: center;       /* Center the image */
+  background-repeat: no-repeat;      /* Avoid tiling */
+  background-attachment: fixed;      /* Keep the background in place on scroll */
   font-family: 'Verdana', sans-serif;
-  color: black;  /* Ensures that text is visible on green background */
+  color: black;                      /* Ensure text stands out */
   margin: 0;
   padding: 0;
-  height: 100%;
+  height: 100vh;                     /* Ensure it covers the viewport height */
 }
-
 /* Styling for the main container */
 .container {
   background-color: rgba(255, 255, 255, 0.85);  /* Semi-transparent white background */

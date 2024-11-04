@@ -8,7 +8,7 @@ from utils import create_standings, hex_to_rgba
 # Get the prepared standings data
 standings_df = create_standings()
 creation_time = os.path.getctime('data/records.json')
-creation_date = datetime.fromtimestamp(creation_time).strftime('%Y-%m-%d')
+creation_date = datetime.fromtimestamp(creation_time).strftime('%B %d, %Y')
 
 
 # Main layout with styled header and centered dropdown
@@ -101,17 +101,19 @@ standings_layout = dbc.Container([
                 html.Div([
                     html.H1("Current Standings", style={
                         "color": "white",
-                        "padding": "10px 10px",
+                        "padding": "0px 0px",
                         "borderRadius": "8px",
                         "fontSize": "2.5rem",
                         "fontWeight": "bold",
-                        "margin": "0"
+                        "margin": "0",
+                        "marginBottom": "2px !important"
                     }),
                     # Displaying the creation date below the heading
                     html.P(f"{creation_date}", style={
                         "color": "white",
                         "fontSize": "1rem",
-                        "marginTop": "2px",
+                        "margin": "0",
+                        "marginTop": "2px !important",
                         "fontStyle": "italic"
                     })
                 ], style={"textAlign": "center"})
