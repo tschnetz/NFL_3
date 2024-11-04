@@ -325,6 +325,7 @@ def get_teams():
 
 def create_standings():
     # Toggle standing_df to rebuild records json files
+    # teams_df = pd.read_json("data/teams.json")
     # standings_df = get_records(teams_df)
     standings_df = pd.read_json("data/records.json")
     divisions_df = pd.read_json("data/divisions.json")
