@@ -1,7 +1,7 @@
 /* Body styles for the football field background */
 
 body {
-  background-image: url('football_field.jpg'); /* Replace with your image path */
+  background-image: url('football_field.webp'); /* Replace with your image path */
   background-size: cover;           /* Ensure the image covers the whole screen */
   background-position: center;       /* Center the image */
   background-repeat: no-repeat;      /* Avoid tiling */
