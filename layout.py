@@ -1,10 +1,15 @@
 # layout.py
 from dash import dcc, html
+import os
+from datetime import datetime
 import dash_bootstrap_components as dbc
 from utils import create_standings, hex_to_rgba
 
 # Get the prepared standings data
 standings_df = create_standings()
+creation_time = os.path.getctime('data/records.json')
+creation_date = datetime.fromtimestamp(creation_time).strftime('%Y-%m-%d')
+
 
 # Main layout with styled header and centered dropdown
 main_layout = dbc.Container([
@@ -92,18 +97,24 @@ standings_layout = dbc.Container([
     dbc.Card([
         dbc.CardBody(
             html.Div([
-                html.Img(src="assets/nfl-3644686_1280.webp", height="50px", style={"marginRight": "15px"}),
-                html.H1("Current Standings", style={
-                    "display": "inline-block",
-                    "verticalAlign": "middle",
-                    "color": "white",
-                    "padding": "10px 20px",
-                    # "backgroundColor": "#1E3A5F",
-                    "borderRadius": "8px",
-                    "fontSize": "2.5rem",
-                    "fontWeight": "bold",
-                    "margin": "0"
-                })
+                html.Img(src="assets/nfl-3644686_1280.webp", height="75px", style={"marginRight": "15px"}),
+                html.Div([
+                    html.H1("Current Standings", style={
+                        "color": "white",
+                        "padding": "10px 10px",
+                        "borderRadius": "8px",
+                        "fontSize": "2.5rem",
+                        "fontWeight": "bold",
+                        "margin": "0"
+                    }),
+                    # Displaying the creation date below the heading
+                    html.P(f"{creation_date}", style={
+                        "color": "white",
+                        "fontSize": "1rem",
+                        "marginTop": "2px",
+                        "fontStyle": "italic"
+                    })
+                ], style={"textAlign": "center"})
             ], style={"display": "flex", "alignItems": "center", "justifyContent": "center"})
         )
     ], style={
