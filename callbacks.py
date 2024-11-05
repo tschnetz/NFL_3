@@ -277,8 +277,8 @@ def register_callbacks(app):
     def update_game_data(n_intervals, init_complete, prev_scores_data):
         global initial_api_call_returned_events
 
-        if not init_complete:
-            return dash.no_update, dash.no_update, n_intervals
+        # if not init_complete:
+        #     return dash.no_update, dash.no_update, n_intervals
 
         # if initial_api_call_returned_events is False:
         #    return dash.no_update, False, n_intervals
@@ -345,6 +345,7 @@ def register_callbacks(app):
             return updated_game_data, games_in_progress, n_intervals
 
         except Exception as e:
+            html.P(f"Error updating game data: {e}")
             return dash.no_update, dash.no_update, n_intervals
 
 
