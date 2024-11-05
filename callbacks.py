@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output, State, MATCH
 from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
-from utils import load_last_fetched_odds, extract_game_info, create_line_scores, format_line_score, format_game_leaders, format_scoring_play
+from utils import load_last_fetched_odds, extract_game_info, create_line_scores, format_line_score, format_game_leaders, format_scoring_play, create_roster_table
 from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds
 
 last_fetched_odds = load_last_fetched_odds()
@@ -403,3 +403,15 @@ def register_callbacks(app):
 
         return outputs
 
+
+    @app.callback(
+        Output("roster-table-container", "children"),
+        Input("team-selector", "value")
+    )
+    def update_roster_table(selected_team_id):
+        if selected_team_id is None:
+            return
+
+        # Fetch and create roster table for the selected team
+        roster_table = create_roster_table(selected_team_id)
+        return roster_table

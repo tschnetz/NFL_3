@@ -274,3 +274,112 @@ h1  {
     height: 28px;
   }
 }
+
+/* Common styling for scoring play rows */
+body .section-container .scoring-play {
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Specific styling for away plays */
+body .section-container .scoring-play.away-play {
+    flex-direction: row;
+}
+body .section-container .scoring-play.away-play .play-text {
+    text-align: left;
+    margin-right: auto;
+}
+
+body .section-container .scoring-play.away-play .play-score {
+    text-align: left;
+    font-weight: bold;
+}
+
+/* Specific styling for home plays */
+body .section-container .scoring-play.home-play {
+    flex-direction: row-reverse;
+}
+
+body .section-container .scoring-play.home-play .play-text {
+    text-align: right;
+    margin-left: auto;
+}
+
+body .section-container .scoring-play.home-play .play-score {
+    text-align: right;
+    font-weight: bold;
+}
+
+/* Logo container */
+body .section-container .play-logo-container {
+    width: 30px;
+    margin: 0 10px;
+}
+
+/* Style for the main roster table */
+.roster-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Style for table headers */
+.roster-table th {
+    background-color: #003f5c;
+    color: white;
+    font-size: 18px;
+    padding: 10px;
+    text-align: left;
+    border-bottom: 2px solid #1E3A5F;
+}
+
+/* Styling for group headers (e.g., Offense, Defense) */
+.roster-group-header {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+    color: white;
+    background-color: lightblue;
+}
+
+/* Styling for position subheadings (e.g., Running Back) */
+.roster-position-header {
+    background-color: #f1f3f4;
+    font-size: 20px;
+    font-style: italic;
+    color: #333;
+    padding: 8px;
+}
+
+/* Alternate row colors */
+.roster-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.roster-table tr:nth-child(odd) {
+    background-color: white;
+}
+
+/* Styling for table data cells */
+.roster-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Hover effect for table rows */
+.roster-table tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Style for player photo */
+.player-photo {
+    margin-right: 10px;
+    border-radius: 50%;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for team and player details */

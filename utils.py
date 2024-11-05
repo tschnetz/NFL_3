@@ -1,11 +1,14 @@
 # utils.py
 import json
+import re
 from dash import html
 import pandas as pd
 import pytz
+from collections import defaultdict
+import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from config import ODDS_FILE_PATH
-from api import fetch_nfl_events, fetch_odds, fetch_division, fetch_team_records, fetch_teams
+from api import fetch_nfl_events, fetch_odds, fetch_division, fetch_team_records, fetch_teams, fetch_players_by_team
 
 
 # Helper function to convert hex to rgba string format
@@ -13,6 +16,12 @@ def hex_to_rgba(hex_color, alpha=0.2):
     hex_color = hex_color.lstrip('#')
     r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
     return f"rgba({r}, {g}, {b}, {alpha})"
+
+
+def parse_and_capitalize(name):
+    # Split camelCase and capitalize each word
+    words = re.sub('([a-z])([A-Z])', r'\1 \2', name).split()
+    return ' '.join(word.capitalize() for word in words)
 
 
 def save_last_fetched_odds(last_fetched_odds):
@@ -137,31 +146,52 @@ def create_line_scores():
 
 
 def format_line_score(home_team, away_team, home_line_scores, away_line_scores):
+    # Determine the maximum number of quarters to display
+    max_quarters = max(len(home_line_scores), len(away_line_scores))
+
+    # Generate the header dynamically based on the number of quarters
+    quarter_headers = []
+    for i in range(max_quarters):
+        if i < 4:  # Standard quarters Q1 to Q4
+            quarter_headers.append(html.Th(f"Q{i + 1}", style={'textAlign': 'center', 'textDecoration': 'underline'}))
+        else:  # Any quarters beyond Q4 will be labeled as "OT"
+            quarter_headers.append(html.Th("OT", style={'textAlign': 'center', 'textDecoration': 'underline'}))
+
+    header_row = html.Tr([
+        html.Th("", style={'textDecoration': 'underline'}),  # Empty cell with underline
+        html.Th("", style={'textDecoration': 'underline'}),  # Empty cell with underline
+        *quarter_headers,
+        html.Th("Total", style={'textAlign': 'center', 'textDecoration': 'underline'})
+    ])
+
     team_rows = []
     for team, scores in [(away_team, away_line_scores), (home_team, home_line_scores)]:
         team_logo = team["team"]["logo"]
         team_name = team["team"]["displayName"]
         total_score = sum(scores)
 
+        # Generate the score cells dynamically based on the number of quarters
+        score_cells = [html.Td(str(score), style={'textAlign': 'center'}) for score in scores]
+
+        # Add empty cells if the team has fewer quarters than max_quarters (e.g., missing overtime scores)
+        score_cells.extend([html.Td("", style={'textAlign': 'center'})] * (max_quarters - len(scores)))
+
+        # Assemble the row for each team
         team_row = html.Tr([
             html.Td(html.Img(src=team_logo, height="50px", style={'marginLeft': '10px'})),
             html.Td(team_name, style={'fontWeight': 'bold', 'font-size': '14'}),
-            *[html.Td(str(score), style={'textAlign': 'center'}) for score in scores],
+            *score_cells,
             html.Td(str(total_score), style={'fontWeight': 'bold', 'textAlign': 'center'})
         ])
         team_rows.append(team_row)
 
+    # Return the completed table with dynamic headers and rows
     return html.Table([
-        html.Thead(html.Tr([
-            html.Th(""), html.Th(""),
-            html.Th("Q1", style={'textAlign': 'center'}), html.Th("Q2", style={'textAlign': 'center'}),
-            html.Th("Q3", style={'textAlign': 'center'}), html.Th("Q4", style={'textAlign': 'center'}),
-            html.Th("Total", style={'textAlign': 'center'})
-        ])),
+        html.Thead(header_row),
         html.Tbody(team_rows)
     ], className="section-container", style={
-        'width': '50%',             # Specific width for the boxscore section
-        'marginLeft': 'auto',       # Center-align the narrower boxscore
+        'width': '50%',  # Specific width for the boxscore section
+        'marginLeft': 'auto',  # Center-align the narrower boxscore
         'marginRight': 'auto'
     })
 
@@ -186,26 +216,41 @@ def format_game_leaders(game_leaders):
 
 
 def format_scoring_play(scoring_plays):
-    """
-    Takes a list of scoring plays and returns a styled Div with the title "Scoring Plays"
-    and a formatted list of individual play elements.
-    """
-    # Format each play as a separate Div element
-    formatted_plays = [
-        html.Div([
-            html.Img(src=play['team'].get('logo', ''), height="30px", style={'marginRight': '10px'}),
-            html.Span(f"Q{play.get('period', {}).get('number', '')} {play.get('clock', {}).get('displayValue', '')} - {play.get('text', '')}"),
-            html.Span(f"{play.get('awayScore', 'N/A')} - {play.get('homeScore', 'N/A')}",
-                      style={'marginLeft': '10px', 'fontWeight': 'bold'})
-        ], style={'display': 'flex', 'alignItems': 'center', 'padding': '5px 0'})
-        for play in scoring_plays
-    ]
+    formatted_plays = []
+    for play in scoring_plays:
+        is_home = play.get("isHome", False)  # Assuming 'isHome' determines home/away status
 
-    # Wrap all plays in a Div with a title and background styling
+        formatted_plays.append(
+            html.Div(
+                [
+                    # Logo container
+                    html.Div(
+                        html.Img(src=play['team'].get('logo', ''), height="30px"),
+                        className="play-logo-container", style={'order': 1 if is_home else 0}
+                    ),
+
+                    # Text container (quarter, time, description)
+                    html.Div(
+                        f"Q{play.get('period', {}).get('number', '')} {play.get('clock', {}).get('displayValue', '')} - {play.get('text', '')}",
+                        className="play-text", style={'textAlign': 'right' if is_home else 'left', 'flex': '1'}
+                    ),
+
+                    # Score container
+                    html.Div(
+                        f"{play.get('awayScore', 'N/A')} - {play.get('homeScore', 'N/A')}",
+                        className="play-score",
+                        style={'textAlign': 'right' if is_home else 'left', 'fontWeight': 'bold', 'order': 0 if is_home else 1}
+                    ),
+                ],
+                className=f"scoring-play {'home-play' if is_home else 'away-play'}",
+                style={'display': 'flex', 'flexDirection': 'row-reverse' if is_home else 'row', 'alignItems': 'center', 'padding': '5px 0'}
+            )
+        )
+
     return html.Div([
         html.H6("Scoring Plays", style={'fontWeight': 'bold', 'paddingBottom': '10px'}),
-        *formatted_plays  # Unpack the list of individual formatted plays
-    ], className="section-container")  # Applying the CSS class here
+        *formatted_plays
+    ], className="section-container")
 
 
 def get_unique_divisions(teams_df):
@@ -335,3 +380,101 @@ def create_standings():
 
 
     return standings_df
+
+
+def create_roster_table(team_id):
+    # Load team data
+    with open('data/teams.json') as f:
+        teams_data = json.load(f)
+
+    # Fetch the selected team data
+    team_data = next((team for team in teams_data if team["id"] == str(team_id)), None)
+    if not team_data:
+        return html.Div("Team not found")
+
+    # Set team logo, name, and color
+    team_logo = team_data['logo']
+    team_name = team_data['display_name']
+    team_color = team_data.get("color", "#003f5c")  # Default color if none is provided
+    background_color_rgba = hex_to_rgba(team_color, alpha=1.0)
+
+    # Team header (logo and name)
+    subheading = dbc.Card([
+        dbc.CardBody([
+            html.Div([
+                html.Img(src=team_data['logo'], height="80px", style={"marginRight": "10px"}),
+                html.H2(team_data["display_name"], style={
+                    "display": "inline-block",
+                    "verticalAlign": "middle",
+                    "marginBottom": "0",
+                    "color": "white",  # Text color
+                    "fontWeight": "bold",
+                    "fontSize": "2.0rem"
+                }),
+            ], style={
+                "backgroundColor": "transparent",
+            })
+        ])
+    ], style={
+        "backgroundColor": background_color_rgba,
+        "borderRadius": "5px",
+        "padding": "5px",
+        "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.2)",
+        "border": f"2px solid {team_color}",
+    })
+
+    # Player data from API
+    player_data = fetch_players_by_team(team_id)
+    table_rows = []
+
+    # Iterate over each group
+    for group in player_data.get("athletes", []):
+        group_name = parse_and_capitalize(group.get("position", "Unknown Group"))
+
+        # Group header row
+        table_rows.append(html.Tr([
+            html.Th(group_name, colSpan=9, className="roster-group-header", style={'textAlign': 'center'})
+        ]))
+
+        # Group players by position
+        players_by_position = defaultdict(list)
+        for player in group.get("items", []):
+            position = player["position"]["displayName"]
+            players_by_position[position].append(player)
+
+        # Iterate over positions
+        for position, position_players in players_by_position.items():
+            # Position subheading
+            table_rows.append(html.Tr([
+                html.Th(position, colSpan=9, className="roster-position-header")
+            ]))
+
+            # Player rows
+            for player in position_players:
+                player_row = html.Tr([
+                    html.Td(html.Img(src=player.get('headshot', {}).get('href', ''), height="50px",
+                                     className="player-photo")),
+                    html.Td(player.get("jersey", "N/A")),
+                    html.Td(player.get("displayName", "Unknown Name")),
+                    html.Td(player["position"].get("displayName", "Unknown Position")),
+                    html.Td(player.get("displayHeight", "N/A")),
+                    html.Td(player.get("displayWeight", "N/A")),
+                    html.Td(player.get("age", "N/A")),
+                    html.Td(player.get("college", {}).get("shortName", "N/A")),
+                    html.Td(player.get("status", {}).get("type", "N/A")),
+                ])
+                table_rows.append(player_row)
+
+    # Construct the table
+    return html.Div([
+        subheading,
+        html.Table([
+            html.Thead(html.Tr([
+                html.Th("Photo"), html.Th("Jersey"), html.Th("Name"),
+                html.Th("Position"), html.Th("Height"), html.Th("Weight"),
+                html.Th("Age"), html.Th("College"), html.Th("Status")
+            ])),
+            html.Tbody(table_rows)
+        ], className="roster-table")
+    ])
+

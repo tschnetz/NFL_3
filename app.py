@@ -28,6 +28,10 @@ app.layout = dbc.Container([
             "Standings", href="/standings", active="exact",
             className="nav-link-custom",
         ),
+        dbc.NavLink(
+            "Rosters", href="/players", active="exact",
+            className="nav-link-custom",
+        ),
     ], pills=True, style={"margin": "20px 0"}),
 
     dash.page_container  # Display selected page content

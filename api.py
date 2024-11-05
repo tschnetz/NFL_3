@@ -4,7 +4,7 @@ from cache_config import cache  # Import cache directly
 import requests
 from datetime import datetime
 from config import (HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL,
-                    SCOREBOARD_WEEK_URL, TEAMS_URL, RECORD_URL, DIVISION_URL)
+                    SCOREBOARD_WEEK_URL, TEAMS_URL, RECORD_URL, DIVISION_URL, PLAYERS_URL)
 
 
 @cache.memoize(timeout=1800)  # Cache for 30 minutes
@@ -89,6 +89,17 @@ def fetch_division(team_id):
     querystring = {"id": team_id, "year": "2024"}
     try:
         response = requests.get(DIVISION_URL, headers=HEADERS, params=querystring)
+        response.raise_for_status()  # Raise an exception for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching team division: {e}")
+        return None
+
+
+def fetch_players_by_team(team_id):
+    querystring = {"id": team_id}
+    try:
+        response = requests.get(PLAYERS_URL, headers=HEADERS, params=querystring)
         response.raise_for_status()  # Raise an exception for bad status codes
         return response.json()
     except requests.exceptions.RequestException as e:

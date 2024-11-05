@@ -1,9 +1,10 @@
 # layout.py
 from dash import dcc, html
+import json
 import os
 from datetime import datetime
 import dash_bootstrap_components as dbc
-from utils import create_standings, hex_to_rgba
+from utils import create_standings, create_roster_table,hex_to_rgba
 
 # Get the prepared standings data
 standings_df = create_standings()
@@ -380,3 +381,62 @@ standings_layout = dbc.Container([
     ]
 ], fluid=True, style={"fontFamily": "Arial, sans-serif", "padding": "20px"})
 
+# Load the teams from JSON
+with open('data/teams.json') as f:
+    teams_data = json.load(f)
+
+# Prepare the dropdown options from the loaded teams data
+team_options = [{"label": team["display_name"], "value": team["id"]} for team in teams_data]
+
+roster_layout = (
+    dbc.Card([
+        dbc.CardBody(
+            html.Div([
+                html.Img(src="assets/nfl-3644686_1280.webp", height="100px", style={"marginRight": "15px"}),
+                html.H1("Roster", style={
+                    "display": "inline-block",
+                    "verticalAlign": "middle",
+                    "color": "white",
+                    "padding": "10px 20px",
+                    # "backgroundColor": "#1E3A5F",
+                    "borderRadius": "8px",
+                    "fontSize": "2.5rem",
+                    "fontWeight": "bold",
+                    "margin": "0"
+                })
+            ], style={"display": "flex", "alignItems": "center", "justifyContent": "center"})
+        )
+    ], style={
+        "backgroundColor": "#1E3A5F",
+        "marginBottom": "20px",
+        "borderRadius": "8px",
+        "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.3)",
+        "padding": "10px"
+    }),
+
+    dbc.Row(
+        dbc.Col(
+            dcc.Dropdown(
+                id='team-selector',
+                options=team_options,
+                placeholder="Select a team",
+                style={
+                    "width": "100%",
+                    "textAlign": "center",
+                    "fontSize": "18px",
+                    "padding": "3px",
+                    "border": "none",
+                    "borderRadius": "8px",
+                    # "backgroundColor": "#FFFFFF",  # Fully opaque white background
+                    "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.1)",  # Subtle shadow
+                }
+            ),
+            width=6,  # Adjust width as needed
+            style={"display": "flex", "justifyContent": "center"}  # Center the dropdown in the column
+        ),
+        justify="center",
+        style={"marginBottom": "20px"}
+    ),
+
+    html.Div(id = "roster-table-container")
+)

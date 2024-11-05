@@ -15,6 +15,7 @@ SCOREBOARD_WEEK_URL = "https://nfl-api-data.p.rapidapi.com/nfl-scoreboard-week-t
 TEAMS_URL = "https://nfl-api-data.p.rapidapi.com/nfl-team-list"
 RECORD_URL = "https://nfl-api-data.p.rapidapi.com/nfl-team-record"
 DIVISION_URL = "https://nfl-api-data.p.rapidapi.com/nfl-team-groups"
+PLAYERS_URL = "https://nfl-api-data.p.rapidapi.com/nfl-player-listing/v1/data"
 HEADERS = {
     "x-rapidapi-key": API_KEY,
     "x-rapidapi-host": "nfl-api-data.p.rapidapi.com"
