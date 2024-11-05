@@ -402,8 +402,8 @@ def create_roster_table(team_id):
     subheading = dbc.Card([
         dbc.CardBody([
             html.Div([
-                html.Img(src=team_data['logo'], height="80px", style={"marginRight": "10px"}),
-                html.H2(team_data["display_name"], style={
+                html.Img(src=team_logo, height="80px", style={"marginRight": "10px"}),
+                html.H2(team_name, style={
                     "display": "inline-block",
                     "verticalAlign": "middle",
                     "marginBottom": "0",
@@ -431,25 +431,44 @@ def create_roster_table(team_id):
     for group in player_data.get("athletes", []):
         group_name = parse_and_capitalize(group.get("position", "Unknown Group"))
 
-        # Group header row
+       # Group header row
         table_rows.append(html.Tr([
-            html.Th(group_name, colSpan=9, className="roster-group-header", style={'textAlign': 'center'})
+            html.Th(group_name, colSpan=9, className="roster-group-header",
+                    style={'textAlign': 'center',
+                           "marginBottom": "0",
+                    "color": "white",  # Text color
+                    "backgroundColor": background_color_rgba,
+                    "fontWeight": "bold",
+                    "fontSize": "1.5rem"})
         ]))
 
-        # Group players by position
+        # Group players by position within each main group (e.g., Running Back under Offense)
         players_by_position = defaultdict(list)
         for player in group.get("items", []):
             position = player["position"]["displayName"]
             players_by_position[position].append(player)
 
-        # Iterate over positions
+        # Iterate over positions within each group
         for position, position_players in players_by_position.items():
             # Position subheading
             table_rows.append(html.Tr([
                 html.Th(position, colSpan=9, className="roster-position-header")
             ]))
 
-            # Player rows
+            # Add smaller repeated headers for clarity
+            table_rows.append(html.Tr([
+                html.Th("", style={"fontSize": "14px", "fontWeight": "normal", "color": "white"}),
+                html.Th("Jersey", style={"fontSize": "14px", "fontWeight": "normal", "color": "#white"}),
+                html.Th("Name", style={"fontSize": "14px", "fontWeight": "normal", "color": "#white"}),
+                html.Th("Position", style={"fontSize": "14px", "fontWeight": "normal", "color": "#white"}),
+                html.Th("Height", style={"fontSize": "14px", "fontWeight": "normal", "color": "#white"}),
+                html.Th("Weight", style={"fontSize": "14px", "fontWeight": "normal", "color": "#white"}),
+                html.Th("Age", style={"fontSize": "14px", "fontWeight": "normal", "color": "#white"}),
+                html.Th("College", style={"fontSize": "14px", "fontWeight": "normal", "color": "#white"}),
+                html.Th("Status", style={"fontSize": "14px", "fontWeight": "normal", "color": "#white"})
+            ]))
+
+            # Player rows for each position
             for player in position_players:
                 player_row = html.Tr([
                     html.Td(html.Img(src=player.get('headshot', {}).get('href', ''), height="50px",
@@ -465,16 +484,10 @@ def create_roster_table(team_id):
                 ])
                 table_rows.append(player_row)
 
-    # Construct the table
+        # Construct the final layout
     return html.Div([
         subheading,
         html.Table([
-            html.Thead(html.Tr([
-                html.Th("Photo"), html.Th("Jersey"), html.Th("Name"),
-                html.Th("Position"), html.Th("Height"), html.Th("Weight"),
-                html.Th("Age"), html.Th("College"), html.Th("Status")
-            ])),
             html.Tbody(table_rows)
         ], className="roster-table")
     ])
-
