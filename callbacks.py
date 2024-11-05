@@ -283,16 +283,17 @@ def register_callbacks(app):
         print("Updating game data")
         global initial_api_call_returned_events
 
-        if not init_complete:
-            print("Initial API call not complete")
-            return dash.no_update, dash.no_update, n_intervals
+        # if not init_complete:
+        #     print("Initial API call not complete")
+        #     return dash.no_update, dash.no_update, n_intervals
 
-        if initial_api_call_returned_events is False:
-            print("Initial API call did not return events")
-            return dash.no_update, False, n_intervals
+        # if initial_api_call_returned_events is False:
+        #     print("Initial API call did not return events")
+        #     return dash.no_update, False, n_intervals
 
         try:
             games_data = fetch_games_by_day()
+            print(f"Games data received: {len(games_data)}")
 
             if not games_data or not games_data.get('events'):
                 initial_api_call_returned_events = False
