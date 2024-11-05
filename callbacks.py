@@ -293,7 +293,9 @@ def register_callbacks(app):
 
         try:
             games_data = fetch_games_by_day()
-            print(f"Games data received: {len(games_data)}")
+            print(f"Games data received: {len(games_data)} records")
+            print(games_data)
+
 
             if not games_data or not games_data.get('events'):
                 initial_api_call_returned_events = False
