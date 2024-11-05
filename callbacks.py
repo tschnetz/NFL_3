@@ -280,8 +280,8 @@ def register_callbacks(app):
         if not init_complete:
             return dash.no_update, dash.no_update, n_intervals
 
-        if initial_api_call_returned_events is False:
-            return dash.no_update, False, n_intervals
+        # if initial_api_call_returned_events is False:
+        #    return dash.no_update, False, n_intervals
 
         try:
             games_data = fetch_games_by_day()
