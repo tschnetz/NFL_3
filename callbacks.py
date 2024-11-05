@@ -284,16 +284,19 @@ def register_callbacks(app):
         global initial_api_call_returned_events
 
         if not init_complete:
+            print("Initial API call not complete")
             return dash.no_update, dash.no_update, n_intervals
 
         if initial_api_call_returned_events is False:
-           return dash.no_update, False, n_intervals
+            print("Initial API call did not return events")
+            return dash.no_update, False, n_intervals
 
         try:
             games_data = fetch_games_by_day()
 
             if not games_data or not games_data.get('events'):
                 initial_api_call_returned_events = False
+                print("No games found")
                 return dash.no_update, False, n_intervals
 
             initial_api_call_returned_events = True
@@ -347,10 +350,11 @@ def register_callbacks(app):
 
             if prev_scores_data == updated_game_data:
                 return dash.no_update, games_in_progress, n_intervals
-
+            print("Successful update of game data")
             return updated_game_data, games_in_progress, n_intervals
 
         except Exception as e:
+            print(f"Error updating game data: {e}")
             return dash.no_update, dash.no_update, n_intervals
 
 
