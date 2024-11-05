@@ -26,7 +26,7 @@ main_layout = dbc.Container([
     dbc.Card([
         dbc.CardBody(
             html.Div([
-                html.Img(src="assets/nfl-3644686_1280.webp", height="50px", style={"marginRight": "15px"}),
+                html.Img(src="assets/nfl-3644686_1280.webp", height="100px", style={"marginRight": "15px"}),
                 html.H1("NFL Games", style={
                     "display": "inline-block",
                     "verticalAlign": "middle",

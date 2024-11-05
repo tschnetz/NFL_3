@@ -156,7 +156,7 @@ def register_callbacks(app):
             games_info.append(
                 dbc.Button(
                     dbc.Row([
-                        dbc.Col(html.Img(src=game_info['Away Team Logo'], height="80px"), width=1,
+                        dbc.Col(html.Img(src=game_info['Away Team Logo'], height="100px"), width=1,
                                 style={'textAlign': 'center'}),
                         dbc.Col(
                             html.Div([
@@ -194,7 +194,7 @@ def register_callbacks(app):
                             ], style={'textAlign': 'center'}),
                             width=3
                         ),
-                        dbc.Col(html.Img(src=game_info['Home Team Logo'], height="80px"), width=1,
+                        dbc.Col(html.Img(src=game_info['Home Team Logo'], height="100px"), width=1,
                                 style={'textAlign': 'center'}),
                         dbc.Col(
                             html.Div(
