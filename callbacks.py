@@ -243,6 +243,9 @@ def register_callbacks(app):
     )
     def display_dynamic_game_info(scores_data, game_id):
         print("Displaying dynamic game info")
+        print(f"Scores data received: {scores_data}")
+        print(f"Game ID received: {game_id}")
+
         game_data = next((game for game in scores_data if game['game_id'] == game_id), None)
 
         if not game_data:
