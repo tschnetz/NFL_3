@@ -242,10 +242,6 @@ def register_callbacks(app):
         [State({'type': 'game-button', 'index': MATCH}, 'value')]
     )
     def display_dynamic_game_info(scores_data, game_id):
-        print("Displaying dynamic game info")
-        print(f"Scores data received: {scores_data}")
-        print(f"Game ID received: {game_id}")
-
         game_data = next((game for game in scores_data if game['game_id'] == game_id), None)
 
         if not game_data:
@@ -280,25 +276,19 @@ def register_callbacks(app):
         prevent_initial_call=True
     )
     def update_game_data(n_intervals, init_complete, prev_scores_data):
-        print("Updating game data")
         global initial_api_call_returned_events
 
-        # if not init_complete:
-        #     print("Initial API call not complete")
-        #     return dash.no_update, dash.no_update, n_intervals
+        if not init_complete:
+            return dash.no_update, dash.no_update, n_intervals
 
-        # if initial_api_call_returned_events is False:
-        #     print("Initial API call did not return events")
-        #     return dash.no_update, False, n_intervals
+        if initial_api_call_returned_events is False:
+            return dash.no_update, False, n_intervals
 
         try:
             games_data = fetch_games_by_day()
-            print(f"Games data received: {len(games_data)} records")
-            print(games_data)
 
             if not games_data or not games_data.get('events'):
                 initial_api_call_returned_events = False
-                print("No games found")
                 return dash.no_update, False, n_intervals
 
             initial_api_call_returned_events = True
@@ -352,11 +342,9 @@ def register_callbacks(app):
 
             if prev_scores_data == updated_game_data:
                 return dash.no_update, games_in_progress, n_intervals
-            print("Successful update of game data")
             return updated_game_data, games_in_progress, n_intervals
 
         except Exception as e:
-            print(f"Error updating game data: {e}")
             return dash.no_update, dash.no_update, n_intervals
 
 

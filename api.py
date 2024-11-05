@@ -48,10 +48,8 @@ def fetch_games_by_day():
     est = pytz.timezone('America/New_York')
     today = datetime.now(est).strftime('%Y%m%d')  # Format the date as 'YYYYMMDD' in EST
     querystring = {"day": today}
-    print(f"Querystring: {querystring}")
     response = requests.get(SCOREBOARD_URL, headers=HEADERS, params=querystring)
     if response.status_code == 200:
-        print("Fetched games for day successfully")
         return response.json()
     return {"error": "Failed to fetch games"}
 
