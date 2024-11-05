@@ -1,4 +1,6 @@
 #api.py
+import pytz
+
 from cache_config import cache  # Import cache directly
 import requests
 from datetime import datetime
@@ -43,7 +45,8 @@ def fetch_odds(game_id):
 
 
 def fetch_games_by_day():
-    today = datetime.now().strftime('%Y%m%d')
+    est = pytz.timezone('America/New_York')
+    today = datetime.now(est).strftime('%Y%m%d')  # Format the date as 'YYYYMMDD' in EST
     querystring = {"day": today}
     print(f"Querystring: {querystring}")
     response = requests.get(SCOREBOARD_URL, headers=HEADERS, params=querystring)
