@@ -296,7 +296,6 @@ def register_callbacks(app):
             print(f"Games data received: {len(games_data)} records")
             print(games_data)
 
-
             if not games_data or not games_data.get('events'):
                 initial_api_call_returned_events = False
                 print("No games found")

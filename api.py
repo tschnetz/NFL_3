@@ -45,6 +45,7 @@ def fetch_odds(game_id):
 def fetch_games_by_day():
     today = datetime.now().strftime('%Y%m%d')
     querystring = {"day": today}
+    print(f"Querystring: {querystring}")
     response = requests.get(SCOREBOARD_URL, headers=HEADERS, params=querystring)
     if response.status_code == 200:
         print("Fetched games for day successfully")
