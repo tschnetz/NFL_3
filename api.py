@@ -6,7 +6,7 @@ from config import (HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_P
                     SCOREBOARD_WEEK_URL, TEAMS_URL, RECORD_URL, DIVISION_URL)
 
 
-@cache.memoize(timeout=1800)  # Cache for 30 minutes
+# @cache.memoize(timeout=1800)  # Cache for 30 minutes
 def fetch_nfl_events():
     querystring = {"year": "2024"}
     try:
@@ -18,7 +18,7 @@ def fetch_nfl_events():
         return None
 
 
-@cache.memoize(timeout=1800)  # Cache for 30 minutes
+# @cache.memoize(timeout=1800)  # Cache for 30 minutes
 def fetch_current_odds(week):
     week -= 3
     querystring = {"year":"2024","type":"2","week":week}
