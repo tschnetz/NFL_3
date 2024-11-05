@@ -242,10 +242,11 @@ def register_callbacks(app):
         [State({'type': 'game-button', 'index': MATCH}, 'value')]
     )
     def display_dynamic_game_info(scores_data, game_id):
-
+        html.P("Dynamic game info...")
         game_data = next((game for game in scores_data if game['game_id'] == game_id), None)
 
         if not game_data:
+            html.P("Game data not found.")
             return [dash.no_update] * 6
 
         game_status = game_data.get('Status', '')
@@ -266,6 +267,7 @@ def register_callbacks(app):
         return home_score, away_score, quarter_time_display, home_team_extra_info, away_team_extra_info, game_status
 
 
+
     @app.callback(
         Output('scores-data', 'data'),
         Output('in-progress-flag', 'data', allow_duplicate=True),
@@ -275,13 +277,14 @@ def register_callbacks(app):
         prevent_initial_call=True
     )
     def update_game_data(n_intervals, init_complete, prev_scores_data):
+        html.P("Updating game data...")
         global initial_api_call_returned_events
 
-        # if not init_complete:
-        #     return dash.no_update, dash.no_update, n_intervals
+        if not init_complete:
+            return dash.no_update, dash.no_update, n_intervals
 
-        # if initial_api_call_returned_events is False:
-        #    return dash.no_update, False, n_intervals
+        if initial_api_call_returned_events is False:
+           return dash.no_update, False, n_intervals
 
         try:
             games_data = fetch_games_by_day()
@@ -345,7 +348,6 @@ def register_callbacks(app):
             return updated_game_data, games_in_progress, n_intervals
 
         except Exception as e:
-            html.P(f"Error updating game data: {e}")
             return dash.no_update, dash.no_update, n_intervals
 
 
