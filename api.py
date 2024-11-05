@@ -47,6 +47,7 @@ def fetch_games_by_day():
     querystring = {"day": today}
     response = requests.get(SCOREBOARD_URL, headers=HEADERS, params=querystring)
     if response.status_code == 200:
+        print("Fetched games for day successfully")
         return response.json()
     return {"error": "Failed to fetch games"}
 
