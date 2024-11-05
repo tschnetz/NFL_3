@@ -242,6 +242,7 @@ def register_callbacks(app):
         [State({'type': 'game-button', 'index': MATCH}, 'value')]
     )
     def display_dynamic_game_info(scores_data, game_id):
+
         game_data = next((game for game in scores_data if game['game_id'] == game_id), None)
 
         if not game_data:

@@ -13,9 +13,9 @@ server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP], title="NFL Games", use_pages=True)
 
 # Initialize cache and clear
-cache.init_app(app.server)
-with app.server.app_context():
-    cache.clear()
+# cache.init_app(app.server)
+# with app.server.app_context():
+#    cache.clear()
 
 # Set up the app layout with navigation and page container
 app.layout = dbc.Container([
