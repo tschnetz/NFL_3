@@ -242,7 +242,6 @@ def register_callbacks(app):
         [State({'type': 'game-button', 'index': MATCH}, 'value')]
     )
     def display_dynamic_game_info(scores_data, game_id):
-        print("Dynamic game info...")
         game_data = next((game for game in scores_data if game['game_id'] == game_id), None)
 
         if not game_data:
@@ -277,7 +276,6 @@ def register_callbacks(app):
         prevent_initial_call=True
     )
     def update_game_data(n_intervals, init_complete, prev_scores_data):
-        print("Updating game data...")
         global initial_api_call_returned_events
 
         if not init_complete:
