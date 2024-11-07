@@ -5,8 +5,9 @@ from dash.dependencies import Input, Output, State, MATCH
 from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
-from utils import load_last_fetched_odds, extract_game_info, create_line_scores, format_line_score, format_game_leaders, format_scoring_play, create_roster_table
-from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds
+from utils import (load_last_fetched_odds, extract_game_info, create_line_scores, format_line_score,
+                   format_game_leaders, format_scoring_play, create_roster_table)
+from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds, fetch_bye_teams
 
 last_fetched_odds = load_last_fetched_odds()
 initial_api_call_returned_events = True
@@ -226,6 +227,38 @@ def register_callbacks(app):
             games_info.append(html.Div(id={'type': 'scoring-plays', 'index': game_id}, children=[]))
             games_info.append(html.Hr())
 
+        # Fetch and display bye teams
+        bye_teams = fetch_bye_teams(selected_week_index)
+        if bye_teams:
+            bye_teams_row = html.Div([
+                html.H4("Teams on Bye", style={'fontWeight': 'bold', 'marginTop': '20px'}),
+                html.Div([
+                    dbc.Row(
+                        [
+                            dbc.Col([
+                                html.Img(src=team['logo'], height="40px", style={'marginRight': '5px'}),
+                                html.Span(team['name'], style={
+                                    'fontWeight': 'bold',
+                                    'color': f"#{team['color']}",
+                                    'fontSize': '1rem',
+                                    'display': 'inline-block',
+                                    'verticalAlign': 'middle'
+                                })
+                            ], width="auto", style={
+                                'display': 'flex',
+                                'alignItems': 'center',
+                                'backgroundColor': 'white',
+                                'borderRadius': '5px',
+                                'padding': '5px',
+                                'margin': '5px'
+                            }) for team in bye_teams
+                        ],
+                        justify="center",
+                        style={'margin': '10px 0'}
+                    )
+                ], style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'borderRadius': '8px'})
+            ])
+            games_info.append(bye_teams_row)
         return games_info, True
 
 
