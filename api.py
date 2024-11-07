@@ -108,34 +108,29 @@ def fetch_players_by_team(team_id):
 
 
 def fetch_bye_teams(week):
-    week -= 3
-    querystring = {"year": "2024", "type": "2", "week": week}
-    response = requests.get(SCOREBOARD_WEEK_URL, headers=HEADERS, params=querystring)
-    if response.status_code == 200:
-        if response.status_code == 200:
-            data = response.json()
+    data = fetch_current_odds(week)
 
-            # Check if "teamsOnBye" is present and not empty
-            bye_teams = data.get("week", {}).get("teamsOnBye", [])
+    # Check if "teamsOnBye" is present and not empty
+    bye_teams = data.get("week", {}).get("teamsOnBye", [])
 
-            if not bye_teams:  # No teams on bye
-                return []  # Return an empty list or add a message if preferred
+    if not bye_teams:  # No teams on bye
+        return []  # Return an empty list or add a message if preferred
 
-            # Extract name, logo, and color for each team on bye
-            teams_on_bye = [
-                {
-                    "id": team["id"],
-                    "name": team["displayName"],
-                    "logo": team["logo"],
-                }
-                for team in bye_teams
-            ]
-            # Append team color from data/teams.json using team's id
-            with open('data/teams.json', 'r') as f:
-                teams = json.load(f)
-            for team in teams_on_bye:
-                team_match = next((t for t in teams if t['id'] == team['id']), None)
-                if team_match:
-                    team['color'] = team_match['color']
-            return teams_on_bye
-    return {"error": "Failed to fetch games"}
+    # Extract name, logo, and color for each team on bye
+    teams_on_bye = [
+        {
+            "id": team["id"],
+            "name": team["displayName"],
+            "logo": team["logo"],
+        }
+        for team in bye_teams
+    ]
+    # Append team color from data/teams.json using team's id
+    with open('data/teams.json', 'r') as f:
+        teams = json.load(f)
+    for team in teams_on_bye:
+        team_match = next((t for t in teams if t['id'] == team['id']), None)
+        if team_match:
+            team['color'] = team_match['color']
+
+    return teams_on_bye
