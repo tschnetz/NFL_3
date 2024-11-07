@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output, State, MATCH
 from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
-from utils import (load_last_fetched_odds, extract_game_info, create_line_scores, format_line_score,
+from utils import (load_last_fetched_odds, get_game_info, create_line_scores, format_line_score,
                    format_game_leaders, format_scoring_play, create_roster_table, hex_to_rgba)
 from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds, fetch_bye_teams
 
@@ -134,7 +134,7 @@ def register_callbacks(app):
 
         games_info = []
         for game in sorted_games:
-            game_info = extract_game_info(game, last_fetched_odds)
+            game_info = get_game_info(game, last_fetched_odds)
             game_id = game.get('id')
             home_color = game_info['Home Team Color']
             away_color = game_info['Away Team Color']
