@@ -6,8 +6,8 @@ from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from utils import (load_last_fetched_odds, get_game_info, create_line_scores, format_line_score,
-                   format_game_leaders, format_scoring_play, create_roster_table, hex_to_rgba)
-from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds, fetch_bye_teams
+                   format_game_leaders, format_scoring_play, create_roster_table, hex_to_rgba, create_bye_teams)
+from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds
 
 last_fetched_odds = load_last_fetched_odds()
 initial_api_call_returned_events = True
@@ -228,7 +228,7 @@ def register_callbacks(app):
             games_info.append(html.Hr())
 
         # Fetch and display bye teams
-        bye_teams = fetch_bye_teams(selected_week_index)
+        bye_teams = create_bye_teams(selected_week_index)
         if bye_teams:
             bye_teams_row = html.Div([
                 html.H5("Teams on Bye", style={

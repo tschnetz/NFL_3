@@ -8,7 +8,8 @@ from collections import defaultdict
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from config import ODDS_FILE_PATH
-from api import fetch_nfl_events, fetch_odds, fetch_division, fetch_team_records, fetch_teams, fetch_players_by_team
+from api import fetch_nfl_events, fetch_odds, fetch_division, fetch_team_records, fetch_teams, fetch_players_by_team, \
+    fetch_current_odds
 
 
 # Helper functions
@@ -500,3 +501,33 @@ def format_scoring_play(scoring_plays):
         html.H6("Scoring Plays", style={'fontWeight': 'bold', 'paddingBottom': '10px'}),
         *formatted_plays
     ], className="section-container")
+
+
+# Bye Teams function
+def create_bye_teams(week):
+    data = fetch_current_odds(week)
+
+    # Check if "teamsOnBye" is present and not empty
+    bye_teams = data.get("week", {}).get("teamsOnBye", [])
+
+    if not bye_teams:  # No teams on bye
+        return []  # Return an empty list or add a message if preferred
+
+    # Extract name, logo, and color for each team on bye
+    teams_on_bye = [
+        {
+            "id": team["id"],
+            "name": team["displayName"],
+            "logo": team["logo"],
+        }
+        for team in bye_teams
+    ]
+    # Append team color from data/teams.json using team's id
+    with open('data/teams.json', 'r') as f:
+        teams = json.load(f)
+    for team in teams_on_bye:
+        team_match = next((t for t in teams if t['id'] == team['id']), None)
+        if team_match:
+            team['color'] = team_match['color']
+
+    return teams_on_bye

@@ -1,7 +1,7 @@
 #api.py
 import pytz
 from cache_config import cache  # Import cache directly
-import requests, json
+import requests
 from datetime import datetime
 from config import (HEADERS, NFL_EVENTS_URL, ODDS_URL, SCOREBOARD_URL, SCORING_PLAYS_URL,
                     SCOREBOARD_WEEK_URL, TEAMS_URL, RECORD_URL, DIVISION_URL, PLAYERS_URL)
@@ -106,31 +106,3 @@ def fetch_players_by_team(team_id):
         print(f"Error fetching team division: {e}")
         return None
 
-
-def fetch_bye_teams(week):
-    data = fetch_current_odds(week)
-
-    # Check if "teamsOnBye" is present and not empty
-    bye_teams = data.get("week", {}).get("teamsOnBye", [])
-
-    if not bye_teams:  # No teams on bye
-        return []  # Return an empty list or add a message if preferred
-
-    # Extract name, logo, and color for each team on bye
-    teams_on_bye = [
-        {
-            "id": team["id"],
-            "name": team["displayName"],
-            "logo": team["logo"],
-        }
-        for team in bye_teams
-    ]
-    # Append team color from data/teams.json using team's id
-    with open('data/teams.json', 'r') as f:
-        teams = json.load(f)
-    for team in teams_on_bye:
-        team_match = next((t for t in teams if t['id'] == team['id']), None)
-        if team_match:
-            team['color'] = team_match['color']
-
-    return teams_on_bye
