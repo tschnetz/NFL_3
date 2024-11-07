@@ -219,6 +219,11 @@ def format_scoring_play(scoring_plays):
     formatted_plays = []
     for play in scoring_plays:
         is_home = play.get("isHome", False)  # Assuming 'isHome' determines home/away status
+        # if period = "Q5" change to period = "OT"
+        if play.get('period', {}).get('number', '') == 5:
+            quarter = "OT"
+        else:
+            quarter = f"Q{play.get('period', {}).get('number', '')}"
 
         formatted_plays.append(
             html.Div(
@@ -231,7 +236,7 @@ def format_scoring_play(scoring_plays):
 
                     # Text container (quarter, time, description)
                     html.Div(
-                        f"Q{play.get('period', {}).get('number', '')} {play.get('clock', {}).get('displayValue', '')} - {play.get('text', '')}",
+                        f"{quarter} {play.get('clock', {}).get('displayValue', '')} - {play.get('text', '')}",
                         className="play-text", style={'textAlign': 'right' if is_home else 'left', 'flex': '1'}
                     ),
 

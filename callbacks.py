@@ -308,6 +308,62 @@ def register_callbacks(app):
 
 
     @app.callback(
+        Output({'type': 'scoring-plays', 'index': dash.dependencies.ALL}, 'children'),
+        [Input({'type': 'game-button', 'index': dash.dependencies.ALL}, 'n_clicks')],
+        [State({'type': 'game-button', 'index': dash.dependencies.ALL}, 'id')]
+    )
+    def display_game_details(n_clicks_list, button_ids):
+        # Initialize output with empty lists for each button
+        outputs = [[]] * len(n_clicks_list)
+
+        # Identify which button triggered the callback
+        ctx = dash.callback_context
+        if not ctx.triggered:
+            return outputs
+
+        # Get the triggered button's index and n_click count
+        triggered_button = ctx.triggered[0]['prop_id'].split('.')[0]
+        game_id = json.loads(triggered_button)['index']
+        triggered_button_index = next(i for i, btn_id in enumerate(button_ids) if btn_id['index'] == game_id)
+
+        # Check if this is a request to show data (odd n_clicks)
+        if n_clicks_list[triggered_button_index] % 2 == 1:
+            # Only fetch and format data when displaying
+            all_line_scores, nfl_events_data = create_line_scores()
+            game_line_scores = all_line_scores.get(game_id, {
+                "home_line_scores": [],
+                "away_line_scores": []
+            })
+
+            scoring_plays = fetch_scoring_plays(game_id)
+            game_data = next((event for event in nfl_events_data.get("events", []) if event.get("id") == game_id), None)
+
+            if game_data:
+                competition_data = game_data.get("competitions", [{}])[0]
+                game_leaders = competition_data.get("leaders", [])
+                teams = competition_data.get("competitors", [])
+            else:
+                game_leaders = []
+                teams = []
+
+            home_team = teams[0] if teams[0].get("homeAway") == "home" else teams[1]
+            away_team = teams[1] if teams[0].get("homeAway") == "home" else teams[0]
+
+            # Build the formatted display for scoring plays
+            formatted_scoring_plays = [
+                format_line_score(home_team, away_team, game_line_scores["home_line_scores"],
+                                  game_line_scores["away_line_scores"]),
+                format_game_leaders(game_leaders),
+                format_scoring_play(scoring_plays)
+            ]
+
+            # Set the output only for the triggered button's index
+            outputs[triggered_button_index] = formatted_scoring_plays
+
+        return outputs
+
+
+    @app.callback(
         Output('scores-data', 'data'),
         Output('in-progress-flag', 'data', allow_duplicate=True),
         Output('interval-scores', 'n_intervals'),
@@ -379,7 +435,6 @@ def register_callbacks(app):
                     'Possession': possession_team,
                 })
 
-
             if prev_scores_data == updated_game_data:
                 return dash.no_update, games_in_progress, n_intervals
             return updated_game_data, games_in_progress, n_intervals
@@ -387,62 +442,6 @@ def register_callbacks(app):
         except Exception as e:
             print(f"Error updating game data: {e}")
             return dash.no_update, dash.no_update, n_intervals
-
-
-    @app.callback(
-        Output({'type': 'scoring-plays', 'index': dash.dependencies.ALL}, 'children'),
-        [Input({'type': 'game-button', 'index': dash.dependencies.ALL}, 'n_clicks')],
-        [State({'type': 'game-button', 'index': dash.dependencies.ALL}, 'id')]
-    )
-    def display_scoring_plays(n_clicks_list, button_ids):
-        # Initialize output with empty lists for each button
-        outputs = [[]] * len(n_clicks_list)
-
-        # Identify which button triggered the callback
-        ctx = dash.callback_context
-        if not ctx.triggered:
-            return outputs
-
-        # Get the triggered button's index and n_click count
-        triggered_button = ctx.triggered[0]['prop_id'].split('.')[0]
-        game_id = json.loads(triggered_button)['index']
-        triggered_button_index = next(i for i, btn_id in enumerate(button_ids) if btn_id['index'] == game_id)
-
-        # Check if this is a request to show data (odd n_clicks)
-        if n_clicks_list[triggered_button_index] % 2 == 1:
-            # Only fetch and format data when displaying
-            all_line_scores, nfl_events_data = create_line_scores()
-            game_line_scores = all_line_scores.get(game_id, {
-                "home_line_scores": [],
-                "away_line_scores": []
-            })
-
-            scoring_plays = fetch_scoring_plays(game_id)
-            game_data = next((event for event in nfl_events_data.get("events", []) if event.get("id") == game_id), None)
-
-            if game_data:
-                competition_data = game_data.get("competitions", [{}])[0]
-                game_leaders = competition_data.get("leaders", [])
-                teams = competition_data.get("competitors", [])
-            else:
-                game_leaders = []
-                teams = []
-
-            home_team = teams[0] if teams[0].get("homeAway") == "home" else teams[1]
-            away_team = teams[1] if teams[0].get("homeAway") == "home" else teams[0]
-
-            # Build the formatted display for scoring plays
-            formatted_scoring_plays = [
-                format_line_score(home_team, away_team, game_line_scores["home_line_scores"],
-                                  game_line_scores["away_line_scores"]),
-                format_game_leaders(game_leaders),
-                format_scoring_play(scoring_plays)
-            ]
-
-            # Set the output only for the triggered button's index
-            outputs[triggered_button_index] = formatted_scoring_plays
-
-        return outputs
 
 
     @app.callback(
