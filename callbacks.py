@@ -6,7 +6,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from utils import (load_last_fetched_odds, extract_game_info, create_line_scores, format_line_score,
-                   format_game_leaders, format_scoring_play, create_roster_table)
+                   format_game_leaders, format_scoring_play, create_roster_table, hex_to_rgba)
 from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds, fetch_bye_teams
 
 last_fetched_odds = load_last_fetched_odds()
@@ -139,8 +139,8 @@ def register_callbacks(app):
             home_color = game_info['Home Team Color']
             away_color = game_info['Away Team Color']
             game_status = game_info['Game Status']
-            home_id = game_info['Home Team ID']
-            away_id = game_info['Away Team ID']
+            # home_id = game_info['Home Team ID']
+            # away_id = game_info['Away Team ID']
             home_team_extra_info = ""
             away_team_extra_info = ""
             game_headline = game_info['Game Headline']
@@ -199,7 +199,7 @@ def register_callbacks(app):
                                 style={'textAlign': 'center'}),
                         dbc.Col(
                             html.Div(
-                                game_info['Game Headline'],
+                                game_headline,
                                 style={
                                     'width': '100%',
                                     'textAlign': 'center',
@@ -231,7 +231,15 @@ def register_callbacks(app):
         bye_teams = fetch_bye_teams(selected_week_index)
         if bye_teams:
             bye_teams_row = html.Div([
-                html.H4("Teams on Bye", style={'fontWeight': 'bold', 'marginTop': '20px'}),
+                html.H5("Teams on Bye", style={
+                    "backgroundColor": "#1E3A5F",
+                    "color": "white",
+                    "fontWeight": "bold",
+                    "marginBottom": "20px",
+                    "borderRadius": "8px",
+                    "boxShadow": "0px 4px 8px rgba(0, 0, 0, 0.3)",
+                    "padding": "10px"}
+                ),
                 html.Div([
                     dbc.Row(
                         [
@@ -239,7 +247,7 @@ def register_callbacks(app):
                                 html.Img(src=team['logo'], height="40px", style={'marginRight': '5px'}),
                                 html.Span(team['name'], style={
                                     'fontWeight': 'bold',
-                                    'color': f"#{team['color']}",
+                                    'color': 'white',
                                     'fontSize': '1rem',
                                     'display': 'inline-block',
                                     'verticalAlign': 'middle'
@@ -247,7 +255,7 @@ def register_callbacks(app):
                             ], width="auto", style={
                                 'display': 'flex',
                                 'alignItems': 'center',
-                                'backgroundColor': 'white',
+                                'backgroundColor': hex_to_rgba(team['color'], alpha=0.7),
                                 'borderRadius': '5px',
                                 'padding': '5px',
                                 'margin': '5px'
@@ -256,7 +264,7 @@ def register_callbacks(app):
                         justify="center",
                         style={'margin': '10px 0'}
                     )
-                ], style={'padding': '10px', 'backgroundColor': '#f8f9fa', 'borderRadius': '8px'})
+                ], style={'padding': '10px', 'borderRadius': '8px'})
             ])
             games_info.append(bye_teams_row)
         return games_info, True
@@ -297,7 +305,6 @@ def register_callbacks(app):
         quarter_time_display = "Final" if game_status == "final" else f"{quarter} Qtr ● {time_remaining}"
 
         return home_score, away_score, quarter_time_display, home_team_extra_info, away_team_extra_info, game_status
-
 
 
     @app.callback(
@@ -378,6 +385,7 @@ def register_callbacks(app):
             return updated_game_data, games_in_progress, n_intervals
 
         except Exception as e:
+            print(f"Error updating game data: {e}")
             return dash.no_update, dash.no_update, n_intervals
 
 
