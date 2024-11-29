@@ -45,7 +45,7 @@ def get_game_odds(game_id, game_status, last_fetched_odds):
     if game_id not in last_fetched_odds:
         # Odds not available in the dictionary, fetch odds regardless of the game status
         odds_data = fetch_odds(game_id)
-        if odds_data:
+        if odds_data and isinstance(odds_data, dict):
             for item in odds_data.get('items', []):
                     if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
                         last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
