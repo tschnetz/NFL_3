@@ -196,7 +196,7 @@ def register_callbacks(app):
                             width=3
                         ),
                         dbc.Col(html.Img(src=game_info['Home Team Logo'], height="100px"), width=1,
-                                style={'textAlign': 'center'}),
+                                style={'textAlign': 'left', 'padding': '0'}),
                         dbc.Col(
                             html.Div(
                                 game_headline,
