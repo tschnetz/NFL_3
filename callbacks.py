@@ -2,11 +2,13 @@
 import dash
 import json
 from dash.dependencies import Input, Output, State, MATCH
-from dash import html
+from dash.exceptions import PreventUpdate
+from dash import html, ctx
 import dash_bootstrap_components as dbc
 from datetime import datetime, timezone
 from utils import (load_last_fetched_odds, get_game_info, create_line_scores, format_line_score,
-                   format_game_leaders, format_scoring_play, create_roster_table, hex_to_rgba, create_bye_teams)
+                   format_game_leaders, format_scoring_play, create_roster_table, hex_to_rgba,
+                   create_bye_teams, update_standings)
 from api import fetch_nfl_events, fetch_games_by_day, fetch_scoring_plays, fetch_current_odds
 
 last_fetched_odds = load_last_fetched_odds()
@@ -455,3 +457,24 @@ def register_callbacks(app):
         # Fetch and create roster table for the selected team
         roster_table = create_roster_table(selected_team_id)
         return roster_table
+
+    @app.callback(
+        Output("button-state", "data"),  # Update the button state
+        Output("update-standings-button", "children"),  # Update the button text
+        Input("update-standings-button", "n_clicks"),
+        State("button-state", "data"),
+        prevent_initial_call=True
+    )
+    def handle_update_standings(n_clicks, current_state):
+        if ctx.triggered_id == "update-standings-button":
+            if current_state == "default":
+                # Set button state to "updating" and update the text
+                return "updating", "Updating..."
+            elif current_state == "updating":
+                try:
+                    # Call the update_standings function
+                    update_standings()
+                    return "default", "Standings Updated!"  # Feedback after success
+                except Exception as e:
+                    return "default", "Update Failed!"  # Feedback on failure
+        raise PreventUpdate

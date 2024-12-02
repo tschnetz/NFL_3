@@ -116,7 +116,16 @@ standings_layout = dbc.Container([
                         "margin": "0",
                         "marginTop": "2px !important",
                         "fontStyle": "italic"
-                    })
+                    }),
+                    # Add the button for updating standings
+                    dbc.Button(
+                        "Update Standings",
+                        id="update-standings-button",
+                        color="primary",
+                        style={"marginTop": "15px"}
+                    ),
+                    # Add a hidden Store component to track the button state
+                    dcc.Store(id="button-state", data="default")
                 ], style={"textAlign": "center"})
             ], style={"display": "flex", "alignItems": "center", "justifyContent": "center"})
         )

@@ -531,3 +531,9 @@ def create_bye_teams(week):
             team['color'] = team_match['color']
 
     return teams_on_bye
+
+
+def update_standings():
+    teams_df = pd.read_json("data/teams.json")
+    get_records(teams_df)
+    return
