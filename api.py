@@ -33,11 +33,11 @@ def fetch_odds(game_id):
     querystring = {"id": game_id}
     try:
         response = requests.get(ODDS_URL, headers=HEADERS, params=querystring)
-        response.raise_for_status()
         odds_data = response.json() if response.status_code == 200 else {}
-        """for item in odds_data.get('items', []):
+        for item in odds_data.get('items', []):
             if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
-                return item.get('details', 'N/A')"""
+                print(item.get('details', 'N/A'))
+                return item.get('details', 'N/A')
     except requests.exceptions.RequestException as e:
         print(f"Error fetching odds: {e}")
         return None

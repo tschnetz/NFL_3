@@ -45,11 +45,9 @@ def get_game_odds(game_id, game_status, last_fetched_odds):
     if game_id not in last_fetched_odds:
         # Odds not available in the dictionary, fetch odds regardless of the game status
         odds_data = fetch_odds(game_id)
-        if odds_data and isinstance(odds_data, dict):
-            for item in odds_data.get('items', []):
-                    if item.get('provider', {}).get('id') == "58":  # ESPN BET Provider ID
-                        last_fetched_odds[game_id] = item.get('details', 'N/A')  # Store the fetched odds
-                        save_last_fetched_odds(last_fetched_odds)  # Save to file
+        last_fetched_odds[game_id] = odds_data  # Store the fetched odds
+        save_last_fetched_odds(last_fetched_odds)  # Save to file
+        return odds_data
     else:
         # Return the last fetched odds if the game is in progress or final
         return last_fetched_odds[game_id]  # Return last fetched odds if available
@@ -185,7 +183,6 @@ def get_game_info(event, last_fetched_odds):
     # Fetch odds based on game status (fetch live odds if scheduled, retain last odds otherwise)
     game_id = event.get('id')
     odds = get_game_odds(game_id, game_status, last_fetched_odds)
-
     # Extract overall records from the statistics
     home_team_record = event['competitions'][0]['competitors'][0]['records'][0]['summary']
     away_team_record = event['competitions'][0]['competitors'][1]['records'][0]['summary']
